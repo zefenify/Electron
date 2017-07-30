@@ -46,7 +46,7 @@ module.exports = (env) => {
     output: {
       filename: '[name].bundle.js',
       path: path.join(__dirname, './build'),
-      publicPath: '/',
+      publicPath: './',
     },
     resolve: {
       alias: { '@app': path.resolve(__dirname, './app') },

@@ -46,7 +46,6 @@ const WolfCola = DJKhaled('loading', 'theme')(({ loading, theme }) => (
                 <span>ArifZefen</span>
                 <Spinner loading={loading} />
               </Link>
-              <Divider />
 
               <div className="nav-list">
                 <NavLinkStyled to="/search">
