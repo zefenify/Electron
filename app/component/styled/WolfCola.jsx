@@ -30,7 +30,13 @@ const WindowDrag = styled.div`
   right: 0;
   left: 0;
   height: 32px;
-  background-color: ${props => props.theme.navbarBackground};
+  background-image: linear-gradient(
+    to right,
+    ${props => props.theme.navbarBackground},
+    ${props => props.theme.navbarBackground} 220px,
+    ${props => props.theme.listBackground} 0px,
+    ${props => props.theme.listBackground}
+  );
   -webkit-app-region: drag;
 `;
 
