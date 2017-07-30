@@ -27,8 +27,9 @@ import SearchContainer from '@app/component/container/SearchContainer';
 
 import Spinner from '@app/component/presentational/Spinner';
 import Mobile from '@app/component/presentational/Mobile';
+import WindowDrag from '@app/component/presentational/WindowDrag';
 
-import { WolfColaContainer, WindowDrag, NavListContainer, NavContainer, RouteContainer } from '@app/component/styled/WolfCola';
+import { WolfColaContainer, NavListContainer, NavContainer, RouteContainer } from '@app/component/styled/WolfCola';
 import Divider from '@app/component/styled/Divider';
 import { NavLinkStyled } from '@app/component/styled/ReactRouter';
 

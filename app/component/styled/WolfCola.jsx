@@ -24,22 +24,6 @@ const WolfColaContainer = styled.div`
   flex-direction: column;
 `;
 
-const WindowDrag = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 32px;
-  background-image: linear-gradient(
-    to right,
-    ${props => props.theme.navbarBackground},
-    ${props => props.theme.navbarBackground} 220px,
-    ${props => props.theme.listBackground} 0px,
-    ${props => props.theme.listBackground}
-  );
-  -webkit-app-region: drag;
-`;
-
 const ControlsContainer = styled.div`
   flex: 0 0 70px;
   background-color: ${props => props.theme.controlBackground};
@@ -131,7 +115,6 @@ const RouteContainer = styled.div`
 
 module.exports = {
   WolfColaContainer,
-  WindowDrag,
   ControlsContainer,
   NavListContainer,
   NavContainer,
