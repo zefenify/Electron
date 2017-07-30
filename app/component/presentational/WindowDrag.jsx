@@ -23,13 +23,17 @@ const WindowDrag = styled.div`
 
   .navigation {
     margin-left: 220px;
-    font-size: 1.8em;
+    font-size: 1.5em;
     display: flex;
     flex-direction: row;
     padding-left: 1em;
 
     & > div {
-      width: 24px;
+      width: 20px;
+
+      &:active {
+        transform: scale(0.9);
+      }
     }
 
     &__back {
@@ -45,8 +49,8 @@ const WindowDrag = styled.div`
 const WindowDragWrapped = ({ history }) => (
   <WindowDrag>
     <div className="navigation">
-      <div onClick={() => history.goBack()} className="navigation__back icon-ion-ios-arrow-back" />
-      <div onClick={() => history.goForward()} className="navigation__forward icon-ion-ios-arrow-forward" />
+      <div onClick={() => history.goBack()} className="navigation__back icon-ion-ios-arrow-left" />
+      <div onClick={() => history.goForward()} className="navigation__forward icon-ion-ios-arrow-right" />
     </div>
   </WindowDrag>
 );
