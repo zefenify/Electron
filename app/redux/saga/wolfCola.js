@@ -163,11 +163,13 @@ function* play(action) {
       wolfCola.current.fade(1, 0, (state.crossfade * 1000));
       // firing `off` and clearing `howlerEnd` fork - avoiding double NEXT #3
       wolfCola.current.off();
-      // on fade completion we'll clear the faded song
+      // on fade completion we'll clear the faded song [if `end` hasn't already cleared it]
       wolfCola.current.once('fade', () => {
-        wolfCola.current.unload();
-        wolfCola.current = null;
-        wolfCola.crossfadeInProgress = false;
+        if (wolfCola.current !== null) {
+          wolfCola.current.unload();
+          wolfCola.current = null;
+          wolfCola.crossfadeInProgress = false;
+        }
       });
     }
 
@@ -176,9 +178,11 @@ function* play(action) {
       wolfCola.next.fade(1, 0, (state.crossfade * 1000));
       wolfCola.next.off();
       wolfCola.next.once('fade', () => {
-        wolfCola.next.unload();
-        wolfCola.next = null;
-        wolfCola.crossfadeInProgress = false;
+        if (wolfCola.next !== null) {
+          wolfCola.next.unload();
+          wolfCola.next = null;
+          wolfCola.crossfadeInProgress = false;
+        }
       });
     }
     // 👇 `PLAY` triggered while crossfade in progress
