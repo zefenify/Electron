@@ -7,8 +7,9 @@ import { eventChannel, END, delay } from 'redux-saga';
 import { select, put, call, fork, take, throttle, takeEvery, takeLatest } from 'redux-saga/effects';
 import { Howl } from 'howler';
 import random from 'lodash/fp/random';
+import { alert } from 'notie';
 
-import { PLAY, NEXT, PREVIOUS, SEEK, TOGGLE_PLAY_PAUSE } from '@app/redux/constant/wolfCola';
+import { PLAY, NEXT, PREVIOUS, SEEK, TOGGLE_PLAY_PAUSE, PREVIOUS_THRESHOLD } from '@app/redux/constant/wolfCola';
 import { BASE } from '@app/config/api';
 
 import { current } from '@app/redux/action/current';
@@ -50,7 +51,12 @@ const howlerEndChannel = key => eventChannel((emitter) => {
 
 const howlerLoadErrorChannel = key => eventChannel((emitter) => {
   wolfCola[key].once('loaderror', (loadError) => {
-    /* handle song load error */
+    alert({
+      type: 'error',
+      text: 'ወይኔ - unable to load music',
+      time: 5,
+    });
+
     wolfCola.crossfadeInProgress = false;
     emitter({ loadError });
     emitter(END);
@@ -360,7 +366,7 @@ function* previous() {
 
   // repeat `ONE`
   // previous triggered while crossfade > playbackPosition
-  if (state.repeat === 'ONE' || state.crossfade > state.playbackPosition) {
+  if (state.repeat === 'ONE' || (state.playbackPosition > PREVIOUS_THRESHOLD && state.crossfade > state.playbackPosition)) {
     yield put({
       type: PLAY,
       payload: {

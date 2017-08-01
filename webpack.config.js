@@ -40,6 +40,7 @@ module.exports = (env) => {
         'reselect',
         'emotion',
         'howler',
+        'notie',
       ],
       app: ['./app/index.jsx'],
     },

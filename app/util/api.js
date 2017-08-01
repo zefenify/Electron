@@ -1,5 +1,6 @@
 // Breaking SAGA! 😔
 import axios from 'axios';
+import { alert } from 'notie';
 
 import { BASE } from '@app/config/api';
 import store from '@app/redux/store';
@@ -35,6 +36,17 @@ module.exports = (URL, cancel) => new Promise((resolve, reject) => {
       resolve(Object.assign(Array.isArray(API_CACHE[URL]) ? [] : {}, API_CACHE[URL]));
     }, (err) => {
       store.dispatch(loading(false));
+
+      // request cancellation will not reject
+      if (axios.isCancel(err)) {
+        return;
+      }
+
+      alert({
+        type: 'error',
+        text: 'ጭራሽ ጭጭ - Network',
+        time: 5,
+      });
 
       reject(err);
     });
