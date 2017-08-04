@@ -23,12 +23,12 @@ const WindowDrag = styled.div`
 
   .navigation {
     margin-left: 220px;
-    font-size: 1.5em;
     display: flex;
     flex-direction: row;
-    padding-left: 1em;
+    padding-left: 2em;
 
     & > div {
+      font-size: 1.5em;
       width: 20px;
 
       &:active {
