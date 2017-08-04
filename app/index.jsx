@@ -22,7 +22,7 @@ import ControlContainer from '@app/component/container/ControlContainer';
 import FeaturedContainer from '@app/component/container/FeaturedContainer';
 import ArtistContainer from '@app/component/container/ArtistContainer';
 import RecentContainer from '@app/component/container/RecentContainer';
-import SurpriseContainer  from '@app/component/container/SurpriseContainer';
+import SurpriseContainer from '@app/component/container/SurpriseContainer';
 import TopContainer from '@app/component/container/TopContainer';
 import SearchContainer from '@app/component/container/SearchContainer';
 import BoxContainer from '@app/component/container/BoxContainer';
