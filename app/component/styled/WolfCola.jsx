@@ -33,6 +33,11 @@ const ControlsContainer = styled.div`
 `;
 
 const NavListContainer = styled.div`
+  position: relative;
+  margin-top: 32px;
+  right: 0;
+  bottom: 0;
+  left: 0;
   flex: 1 0 auto;
   display: flex;
   flex-direction: row;
@@ -41,7 +46,7 @@ const NavListContainer = styled.div`
 const NavContainer = styled.div`
   position: relative;
   flex: 0 0 220px;
-  height: calc(100vh - 70px);
+  height: calc(100vh - 102px);
   display: flex;
   flex-direction: column;
   background-color: ${props => props.theme.navbarBackground};
@@ -101,7 +106,7 @@ const RouteContainer = styled.div`
   flex-direction: column;
   background-color: ${props => props.theme.listBackground};
   color: ${props => props.theme.listText};
-  max-height: calc(100vh - 70px);
+  max-height: calc(100vh - 102px);
   overflow-y: auto;
   padding: 1em 2em;
   padding-bottom: 0;

@@ -1,6 +1,6 @@
 // Breaking SAGA! 😔
 import axios from 'axios';
-import notie from 'notie';
+import { alert } from 'notie';
 
 import { BASE } from '@app/config/api';
 import store from '@app/redux/store';
@@ -42,7 +42,7 @@ module.exports = (URL, cancel) => new Promise((resolve, reject) => {
         return;
       }
 
-      notie.alert({
+      alert({
         type: 'error',
         text: 'ጭራሽ ጭጭ - Network',
         time: 5,

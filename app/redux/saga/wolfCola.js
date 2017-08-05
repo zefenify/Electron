@@ -7,7 +7,7 @@ import { eventChannel, END, delay } from 'redux-saga';
 import { select, put, call, fork, take, throttle, takeEvery, takeLatest } from 'redux-saga/effects';
 import { Howl } from 'howler';
 import random from 'lodash/fp/random';
-import notie from 'notie';
+import { alert } from 'notie';
 
 import { PLAY, NEXT, PREVIOUS, SEEK, TOGGLE_PLAY_PAUSE, PREVIOUS_THRESHOLD } from '@app/redux/constant/wolfCola';
 import { BASE } from '@app/config/api';
@@ -51,13 +51,12 @@ const howlerEndChannel = key => eventChannel((emitter) => {
 
 const howlerLoadErrorChannel = key => eventChannel((emitter) => {
   wolfCola[key].once('loaderror', (loadError) => {
-    notie.alert({
+    alert({
       type: 'error',
       text: 'ወይኔ - unable to load music',
       time: 5,
     });
 
-    /* handle song load error */
     wolfCola.crossfadeInProgress = false;
     emitter({ loadError });
     emitter(END);
@@ -164,7 +163,7 @@ function* play(action) {
       wolfCola.current.fade(1, 0, (state.crossfade * 1000));
       // firing `off` and clearing `howlerEnd` fork - avoiding double NEXT #3
       wolfCola.current.off();
-      // on fade completion we'll clear the faded song
+      // on fade completion we'll clear the faded song [if `end` hasn't already cleared it]
       wolfCola.current.once('fade', () => {
         if (wolfCola.current !== null) {
           wolfCola.current.unload();
