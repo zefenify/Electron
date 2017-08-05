@@ -55,7 +55,7 @@ const Setting = ({
           step="1"
         />
       </div>
-    </SettingWrapper>
+    </SettingContainer>
   );
 };
 
