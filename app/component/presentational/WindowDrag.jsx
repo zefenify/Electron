@@ -20,6 +20,7 @@ const WindowDrag = styled.div`
   );
   color: ${props => props.theme.listText};
   -webkit-app-region: drag;
+  border-bottom: 1px solid ${props => props.theme.listDivider};
 
   .navigation {
     margin-left: 220px;
