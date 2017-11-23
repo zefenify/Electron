@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'emotion-theming';
 
@@ -32,6 +32,7 @@ import NotificationContainer from '@app/component/container/NotificationContaine
 import Divider from '@app/component/styled/Divider';
 import Spinner from '@app/component/presentational/Spinner';
 import Mobile from '@app/component/presentational/Mobile';
+import WindowDrag from '@app/component/presentational/WindowDrag';
 import { Search, Trending, Settings } from '@app/component/presentational/SVG';
 
 import DJKhaled from '@app/component/hoc/DJKhaled';
@@ -127,6 +128,7 @@ class WolfCola extends Component {
                 <ControlContainer />
               </WolfColaContainer>
 
+              <WindowDrag />
               <Mobile />
               <ContextOverlayContainer />
               <ContextMenuContainer />
