@@ -9,14 +9,6 @@ const commonPlugins = [
   new HtmlWebpackPlugin({
     template: 'app/index.html',
     filename: 'index.html',
-
-    minify: {
-      collapseInlineTagWhitespace: true,
-      collapseWhitespace: true,
-      removeAttributeQuotes: true,
-      removeComments: true,
-    },
-    hash: true,
   }),
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
@@ -49,7 +41,7 @@ module.exports = (env) => {
       ],
     },
     output: {
-      filename: '[name].bundle.js',
+      filename: '[name].bundle.[hash].js',
       path: path.join(__dirname, './build'),
       publicPath: '/',
     },
@@ -116,7 +108,7 @@ module.exports = (env) => {
         },
       }),
       new ExtractTextPlugin({
-        filename: '[name].bundle.css',
+        filename: '[name].bundle.[hash].css',
         disable: false,
         allChunks: true,
       }),
