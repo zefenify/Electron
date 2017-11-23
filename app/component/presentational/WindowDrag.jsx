@@ -23,6 +23,13 @@ const WindowDrag = styled.div`
   color: ${props => props.theme.listText};
   -webkit-app-region: drag;
   border-bottom: 1px solid ${props => props.theme.listDivider};
+  transform: translate3d(0, 0, 0);
+  transition: transform 256ms;
+  will-change: transform;
+
+  &.booting {
+    transform: translate3d(0, -32px, 0);
+  }
 
   .navigation {
     display: flex;
@@ -57,7 +64,7 @@ const WindowDrag = styled.div`
 `;
 
 const WindowDragWrapped = ({ history }) => (
-  <WindowDrag>
+  <WindowDrag className="booting" id="wolf-cola-drag">
     <div className="navigation">
       <ClearButton onClick={() => history.goBack()} className="navigation__back">
         <ChevronLeft />

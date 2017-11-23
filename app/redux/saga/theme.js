@@ -15,7 +15,9 @@ function* themeBootFromLF() {
     const lfTheme = yield localforage.getItem(LF_STORE.THEME);
     yield put(theme(lfTheme === null ? 'dark' : lfTheme));
     const WolfColaContainer = document.querySelector('#wolf-cola-container');
+    const WolfColaDrag = document.querySelector('#wolf-cola-drag');
     WolfColaContainer.classList.remove('booting');
+    WolfColaDrag.classList.remove('booting');
   } catch (err) {
     console.warn('Unable to boot theme from LF', err);
   }
