@@ -7,11 +7,6 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const commonPlugins = [
   new webpack.optimize.ModuleConcatenationPlugin(),
   new HtmlWebpackPlugin({
-    // production
-    // template: 'app/index.php',
-    // filename: 'index.php',
-
-    // development
     template: 'app/index.html',
     filename: 'index.html',
 
