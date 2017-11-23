@@ -1,13 +1,13 @@
 import React from 'react';
 import { bool } from 'prop-types';
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 import { keyframes } from 'emotion';
 
 const bounce = keyframes`
   0%, 100% {
-    transform: scale(0.0);
+    transform: scale3d(0, 0, 0);
   } 50% {
-    transform: scale(1.0);
+    transform: scale3d(1, 1, 1);
   }
 `;
 
@@ -46,7 +46,9 @@ const SpinnerContainer = styled.div`
   }
 `;
 
-function Spinner({ loading }) {
+function Spinner({
+  loading,
+}) {
   return (
     <SpinnerContainer className={loading ? 'active' : ''}>
       <div className="double-bounce1" />

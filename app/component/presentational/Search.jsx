@@ -1,10 +1,14 @@
 import React from 'react';
 import { string, func, bool, shape } from 'prop-types';
-import styled from 'emotion/react';
+import styled from 'react-emotion';
+import { Link } from 'react-router-dom';
+import isEqual from 'lodash/fp/isEqual';
 
-import { BASE } from '@app/config/api';
+import { BASE_S3 } from '@app/config/api';
 
-import Song from '@app/component/presentational/Song';
+import Track from '@app/component/presentational/Track';
+import Divider from '@app/component/styled/Divider';
+import ImageContainer from '@app/component/styled/ImageContainer';
 
 const SearchContainer = styled.div`
   display: flex;
@@ -54,22 +58,60 @@ const SearchContainer = styled.div`
     margin-bottom: 1px;
 
     &.no-matches {
+      bottom: 70px;
       flex: 1 0 auto;
       justify-content: center;
       align-items: center;
       font-size: 2em;
     }
 
-    &__artwork {
-      flex: 0 0 225px;
-      height: 225px;
-      border: 1px solid rgba(51, 51, 51, 0.25);
-      border-radius: 6px;
+    &__list {
+      flex: 1 1 auto;
+
+      & > h2:first-child {
+        margin-top: 0;
+      }
     }
 
-    &__list {
-      padding-left: 1em;
-      flex: 1 1 auto;
+    .result-match-list {
+      display: flex;
+      flex-direction: row;
+      min-height: 225px;
+      max-width: calc(100vw - (200px + 4em));
+      overflow-x: scroll;
+
+      &__match {
+        padding-right: 2em;
+        flex: 0 0 20%;
+      }
+    }
+  }
+
+  .artist {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+
+    &__name {
+      text-align: center;
+    }
+  }
+
+  .apu {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+
+    &__name {
+      margin: 0.5em 0;
+    }
+
+    &__year {
+      margin: 0;
+      margin-bottom: 1em;
+      color: ${props => props.theme.controlMute};
     }
   }
 `;
@@ -80,17 +122,18 @@ const Search = ({
   current,
   playing,
   handleChange,
-  togglePlayPauseSong,
+  trackPlayPause,
+  contextMenuTrack,
 }) => {
   // initial component mount
   if (matches === null) {
     return (
       <SearchContainer>
         <div className="search">
-          <div className="search__label">Search for an Artist, Song or Album</div>
+          <div className="search__label">Search for an Artist, Song, Album or Playlist</div>
           <input
             className="search__input"
-            placeholder="አኩኩሉ..."
+            placeholder="Search"
             value={q}
             onChange={handleChange}
           />
@@ -100,21 +143,26 @@ const Search = ({
   }
 
   // no matches found
-  if (matches.songs.length === 0) {
+  if (isEqual(matches)({
+    album: [],
+    artist: [],
+    playlist: [],
+    track: [],
+  })) {
     return (
       <SearchContainer>
         <div className="search">
-          <div className="search__label">Search for an Artist, Song or Album</div>
+          <div className="search__label">Search for an Artist, Song, Album or Playlist</div>
           <input
             className="search__input"
-            placeholder="አኩኩሉ..."
+            placeholder="Search"
             value={q}
             onChange={handleChange}
           />
         </div>
 
         <div className="result no-matches">
-          <h2>{`ጉራ ብቻ - የለም match ለ "${q}"...`}</h2>
+          <h3>No Results</h3>
         </div>
       </SearchContainer>
     );
@@ -124,30 +172,91 @@ const Search = ({
   return (
     <SearchContainer>
       <div className="search">
-        <div className="search__label">Search for an Artist, Song or Album</div>
+        <div className="search__label">Search for an Artist, Song, Album or Playlist</div>
         <input
           className="search__input"
-          placeholder="አኩኩሉ..."
+          placeholder="Search"
           value={q}
           onChange={handleChange}
         />
       </div>
 
       <div className="result">
-        <div className="result__artwork" style={{ background: `transparent url('${BASE}${matches.thumbnail}') 50% 50% / cover no-repeat` }} />
-
         <div className="result__list">
+          { /* artist */ }
+          { matches.artist.length > 0 ? <h2><Divider textTheme>Artists&nbsp;</Divider></h2> : null }
           {
-            matches.songs.map((song, index) => (
-              <Song
-                key={song.songId}
-                currentSongId={current === null ? -1 : current.songId}
-                trackNumber={index + 1}
-                togglePlayPause={togglePlayPauseSong}
-                playing={playing}
-                {...song}
-              />
-            ))
+            matches.artist.length > 0 ?
+              <div className="result-match-list">
+                { matches.artist.map(artist => (
+                  <Link to={`artist/${artist.artist_id}`} className="result-match-list__match artist">
+                    <ImageContainer borderRadius="50%">
+                      <img alt={`${artist.artist_name}`} src={`${BASE_S3}${artist.artist_cover.s3_name}`} />
+                    </ImageContainer>
+                    <h3 className="artist__name">{ artist.artist_name }</h3>
+                  </Link>))
+                }
+              </div> : null
+          }
+
+          { /* album */ }
+          { /* apu: album-playlist[-uplaylist] */ }
+          { matches.album.length > 0 ? <h2><Divider textTheme>Albums&nbsp;</Divider></h2> : null }
+          {
+            matches.album.length > 0 ?
+              <div className="result-match-list">
+                { matches.album.map(album => (
+                  <Link to={`album/${album.album_id}`} className="result-match-list__match apu">
+                    <ImageContainer>
+                      <img alt={`${album.album_name}`} src={`${BASE_S3}${album.album_cover.s3_name}`} />
+                    </ImageContainer>
+                    <h3 className="apu__name">{ album.album_name }</h3>
+                    <p className="apu__year">{ album.album_year }</p>
+                  </Link>))
+                }
+              </div> : null
+          }
+
+          { /* playlist */ }
+          { matches.playlist.length > 0 ? <h2><Divider textTheme>Playlists&nbsp;</Divider></h2> : null }
+          {
+            matches.playlist.length > 0 ?
+              <div className="result-match-list">
+                { matches.playlist.map(playlist => (
+                  <Link to={`playlist/${playlist.playlist_id}`} className="result-match-list__match apu">
+                    <ImageContainer>
+                      <img alt={`${playlist.playlist_name}`} src={`${BASE_S3}${playlist.playlist_cover.s3_name}`} />
+                    </ImageContainer>
+                    <h3 className="apu__name">{ playlist.playlist_name }</h3>
+                  </Link>))
+                }
+              </div> : null
+          }
+
+          { /* track */ }
+          { matches.track.length > 0 ? <h2><Divider textTheme>Tracks&nbsp;</Divider></h2> : null }
+          {
+            matches.track.length > 0 ?
+              <div>
+                <Divider />
+                {
+                  matches.track.map((track, index) => (
+                    <Track
+                      key={track.track_id}
+                      currentTrackId={current === null ? '' : current.track_id}
+                      trackNumber={index + 1}
+                      trackPlayPause={trackPlayPause}
+                      playing={playing}
+                      trackId={track.track_id}
+                      trackName={track.track_name}
+                      trackFeaturing={track.track_featuring}
+                      trackDuration={track.track_track.s3_meta.duration}
+                      trackAlbum={track.track_album}
+                      contextMenuTrack={contextMenuTrack}
+                    />
+                  ))
+                }
+              </div> : null
           }
         </div>
       </div>
@@ -161,7 +270,8 @@ Search.propTypes = {
   current: shape({}),
   playing: bool,
   handleChange: func.isRequired,
-  togglePlayPauseSong: func.isRequired,
+  trackPlayPause: func.isRequired,
+  contextMenuTrack: func.isRequired,
 };
 
 Search.defaultProps = {

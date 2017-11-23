@@ -1,20 +1,9 @@
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 
+// #context-overlay-container = [98, 100]
+// #context-menu-container = 999
+// #mobile = 1000
 const WolfColaContainer = styled.div`
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-    border-radius: 0;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    border-radius: 2px;
-    background-color: ${props => props.theme.controlMute};
-  }
-
   position: absolute;
   top: 0;
   right: 0;
@@ -22,6 +11,18 @@ const WolfColaContainer = styled.div`
   left: 0;
   display: flex;
   flex-direction: column;
+  z-index: 99;
+  opacity: 1;
+  filter: blur(0px);
+  transform: scale3d(1, 1, 1);
+  transition: transform 256ms, filter 256ms, opacity 256ms;
+  will-change: transform, filter, opacity;
+
+  &.context-menu-active {
+    opacity: 0.92;
+    filter: blur(4px);
+    transform: scale3d(0.96, 0.96, 1);
+  }
 `;
 
 const ControlsContainer = styled.div`
@@ -33,11 +34,6 @@ const ControlsContainer = styled.div`
 `;
 
 const NavListContainer = styled.div`
-  position: relative;
-  margin-top: 32px;
-  right: 0;
-  bottom: 0;
-  left: 0;
   flex: 1 0 auto;
   display: flex;
   flex-direction: row;
@@ -45,8 +41,8 @@ const NavListContainer = styled.div`
 
 const NavContainer = styled.div`
   position: relative;
-  flex: 0 0 220px;
-  height: calc(100vh - 102px);
+  flex: 0 0 200px;
+  height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
   background-color: ${props => props.theme.navbarBackground};
@@ -71,10 +67,9 @@ const NavContainer = styled.div`
     color: inherit;
     box-shadow: 0 0 4px 2px ${props => props.theme.navBarBoxShadow};
 
-    & > img.brand-image {
+    & > img.brand-img {
       width: 40px;
       height: 40px;
-      border-radius: 3px;
       margin-right: 0.75em;
     }
   }
@@ -106,7 +101,8 @@ const RouteContainer = styled.div`
   flex-direction: column;
   background-color: ${props => props.theme.listBackground};
   color: ${props => props.theme.listText};
-  max-height: calc(100vh - 102px);
+  max-height: calc(100vh - 70px);
+  max-width: calc(100vw - 200px);
   overflow-y: auto;
   padding: 1em 2em;
   padding-bottom: 0;

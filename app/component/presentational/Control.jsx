@@ -1,13 +1,184 @@
 import React from 'react';
-import { func, bool, string, number, oneOfType, object } from 'prop-types';
+import { func, bool, string, number, oneOfType, shape } from 'prop-types';
 import { Link } from 'react-router-dom';
-import styled from 'emotion/react';
+import styled from 'react-emotion';
 
-import { BASE } from '@app/config/api';
+import { BASE_S3 } from '@app/config/api';
 import { human } from '@app/util/time';
 
 import { ControlsContainer } from '@app/component/styled/WolfCola';
+import ArtistList from '@app/component/presentational/ArtistList';
 import Range from '@app/component/styled/Range';
+
+const SkipBack = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polygon points="19 20 9 12 19 4 19 20" fill="currentColor" />
+    <line x1="5" y1="19" x2="5" y2="5" />
+  </svg>
+);
+
+const SkipForward = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
+    <line x1="19" y1="5" x2="19" y2="19" />
+  </svg>
+);
+
+const Repeat = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="17 1 21 5 17 9" />
+    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+    <polyline points="7 23 3 19 7 15" />
+    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+  </svg>
+);
+
+const Shuffle = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="16 3 21 3 21 8" />
+    <line x1="4" y1="20" x2="21" y2="3" />
+    <polyline points="21 16 21 21 16 21" />
+    <line x1="15" y1="15" x2="21" y2="21" />
+    <line x1="4" y1="4" x2="9" y2="9" />
+  </svg>
+);
+
+const PlayPause = ({ playing }) => (
+  <svg
+    width="34"
+    height="34"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    {
+      playing ?
+        <g>
+          <circle cx="12" cy="12" r="10" />
+          <line x1="10" y1="15" x2="10" y2="9" />
+          <line x1="14" y1="15" x2="14" y2="9" />
+        </g>
+        :
+        <g>
+          <circle cx="12" cy="12" r="10" />
+          <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
+        </g>
+    }
+  </svg>
+);
+
+PlayPause.propTypes = {
+  playing: bool,
+};
+
+PlayPause.defaultProps = {
+  playing: true,
+};
+
+const Volume = ({
+  onClick,
+  volume,
+}) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    onClick={onClick}
+  >
+    {
+      volume > 0.6 ?
+        <g>
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+        </g>
+
+        :
+
+        volume === 0 ?
+          <g>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </g>
+
+          :
+
+          <g>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </g>
+    }
+  </svg>
+);
+
+Volume.propTypes = {
+  onClick: func.isRequired,
+  volume: number,
+};
+
+Volume.defaultProps = {
+  volume: 0,
+};
+
+const Circle = props => (
+  <svg
+    width="4"
+    height="4"
+    viewBox="0 0 2 2"
+    fill="currentColor"
+    stroke="none"
+    strokeWidth="1"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="1" cy="1" r="1" />
+  </svg>
+);
 
 const NowPlayingContainer = styled.div`
   flex: 0 1 250px;
@@ -16,7 +187,7 @@ const NowPlayingContainer = styled.div`
   display: flex;
   align-items: center;
 
-  .song {
+  .track {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -26,8 +197,8 @@ const NowPlayingContainer = styled.div`
       flex: 0 0 60px;
       width: 60px;
       height: 60px;
-      border-radius: 4px;
-      border: 1px solid rgba(51, 51, 51, 0.25);
+      border-radius: 2px;
+      text-decoration: none;
     }
 
     &__name {
@@ -36,7 +207,7 @@ const NowPlayingContainer = styled.div`
     }
   }
 
-  .song-name {
+  .track-name {
     display: flex;
     flex-direction: column;
 
@@ -48,7 +219,6 @@ const NowPlayingContainer = styled.div`
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      text-decoration: none;
     }
 
     &__name {
@@ -56,8 +226,9 @@ const NowPlayingContainer = styled.div`
       color: ${props => props.theme.controlText};
     }
 
-    &__artist {
+    &__artist a {
       color: ${props => props.theme.controlMute};
+      text-decoration: none;
     }
   }
 `;
@@ -72,18 +243,16 @@ const MusicControls = styled.div`
   flex: 0 0 40px;
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   font-size: 1.75em;
-  padding-bottom: 0.2em;
+  padding-top: 0.25em;
 
   .control {
     position: relative;
     display: flex;
-
-    &:hover {
-      transform: scale(1.2);
-    }
+    transition: transform 256ms;
+    will-change: transform;
 
     &_active {
       color: ${props => props.theme.primary};
@@ -91,7 +260,8 @@ const MusicControls = styled.div`
 
     &__state {
       position: absolute;
-      left: 50%;
+      top: -4px;
+      right: 20px;
       width: 14px;
       height: 14px;
       padding: 0.25em 0.5em;
@@ -114,9 +284,13 @@ const MusicControls = styled.div`
       bottom: -8px;
       margin: 0 auto;
     }
+
+    &:hover {
+      transform: scale3d(1.075, 1.075, 1);
+    }
   }
 
-  & [class^="icon-"] {
+  & > * {
     padding: 0 1em;
   }
 `;
@@ -136,9 +310,10 @@ const VolumeContainer = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  padding: 0 1em;
 
-  [class^="icon-"] {
-    padding: 0 0.5em;
+  input[type="range"] {
+    margin: 0 0.5em;
   }
 `;
 
@@ -161,17 +336,24 @@ const Control = ({
   muteVolume,
   maxVolume,
   setRepeat,
+  urlCurrentPlaying,
 }) => (
   <ControlsContainer>
     <NowPlayingContainer>
       {
         current !== null
           ? (
-            <div className="song">
-              <div className="song__artwork" style={{ background: `transparent url('${BASE}${current.thumbnail}') 50% 50% / cover no-repeat` }} />
-              <div className="song__name song-name">
-                <p className="song-name__name">{ current.songName }</p>
-                <Link to={`/artist/${current.artistId}`} className="song-name__artist">{ current.artistName }</Link>
+            <div className="track">
+              {
+                urlCurrentPlaying === null
+                ? <div className="track__artwork" style={{ background: `transparent url('${BASE_S3}${current.track_album.album_cover.s3_name}') 50% 50% / cover no-repeat` }} />
+                : <Link to={urlCurrentPlaying} className="track__artwork" style={{ background: `transparent url('${BASE_S3}${current.track_album.album_cover.s3_name}') 50% 50% / cover no-repeat` }} />
+              }
+              <div className="track__name track-name">
+                <p className="track-name__name">{ current.track_name }</p>
+                <div className="track-name__artist">
+                  <ArtistList artists={current.track_album.album_artist} />
+                </div>
               </div>
             </div>
           ) : null
@@ -181,26 +363,26 @@ const Control = ({
     <MusicControlsContainer>
       <MusicControls>
         <div className={`control ${shuffle ? 'control_active' : ''}`} onClick={toggleShuffle}>
-          <i className="icon-ion-ios-shuffle-strong" />
-          <i className="control__accessibility icon-circle" style={{ opacity: shuffle ? 1 : 0 }}></i>
+          <Shuffle />
+          <Circle className="control__accessibility" style={{ opacity: shuffle ? 1 : 0 }} />
         </div>
 
         <div className="control" onClick={previous}>
-          <i className="icon-ion-ios-skipbackward" />
+          <SkipBack />
         </div>
 
         <div className="control" onClick={togglePlayPause}>
-          <i className={`icon-ion-ios-${playing ? 'pause' : 'play'}`} />
+          <PlayPause playing={playing} />
         </div>
 
         <div className="control" onClick={next}>
-          <i className="icon-ion-ios-skipforward" />
+          <SkipForward />
         </div>
 
         <div className={`control ${repeat === 'OFF' ? '' : 'control_active'}`} onClick={setRepeat}>
-          <i className="icon-ion-ios-loop-strong" />
+          <Repeat />
           <div className="control__state" style={{ opacity: repeat === 'ONE' ? 1 : 0 }}>1</div>
-          <i className="control__accessibility icon-circle" style={{ opacity: (repeat === 'ONE' || repeat === 'ALL') ? 1 : 0 }}></i>
+          <Circle className="control__accessibility" style={{ opacity: (repeat === 'ONE' || repeat === 'ALL') ? 1 : 0 }} />
         </div>
       </MusicControls>
 
@@ -226,7 +408,8 @@ const Control = ({
     </MusicControlsContainer>
 
     <VolumeContainer>
-      <i className="icon-ion-ios-volume-low" style={{ fontSize: '2em' }} onClick={muteVolume} />
+      <Volume volume={volume} onClick={() => volume === 0 ? maxVolume() : muteVolume()} />
+
       <Range
         type="range"
         min="0"
@@ -235,13 +418,12 @@ const Control = ({
         value={volume}
         onChange={e => setVolume(e)}
       />
-      <i className="icon-ion-ios-volume-high" style={{ fontSize: '2em' }} onClick={maxVolume} />
     </VolumeContainer>
   </ControlsContainer>
 );
 
 Control.propTypes = {
-  current: oneOfType([object]),
+  current: oneOfType([shape({})]),
   togglePlayPause: func.isRequired,
   next: func.isRequired,
   previous: func.isRequired,
@@ -252,6 +434,7 @@ Control.propTypes = {
   remaining: bool,
   duration: number,
   playbackPosition: number,
+  urlCurrentPlaying: oneOfType([string, shape({})]),
   seek: func.isRequired,
   toggleShuffle: func.isRequired,
   toggleRemaining: func.isRequired,
@@ -270,6 +453,7 @@ Control.defaultProps = {
   remaining: false,
   duration: 0,
   playbackPosition: 0,
+  urlCurrentPlaying: null,
 };
 
 module.exports = Control;

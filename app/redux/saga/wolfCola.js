@@ -1,3 +1,5 @@
+/* eslint no-underscore-dangle: off */
+
 /**
  * Everything to do with Howler is handled here. it doesn't necessary have
  * *direct* association with Redux store, but knows what sags to call
@@ -7,22 +9,24 @@ import { eventChannel, END, delay } from 'redux-saga';
 import { select, put, call, fork, take, throttle, takeEvery, takeLatest } from 'redux-saga/effects';
 import { Howl } from 'howler';
 import random from 'lodash/fp/random';
-import { alert } from 'notie';
 
-import { PLAY, NEXT, PREVIOUS, SEEK, TOGGLE_PLAY_PAUSE, PREVIOUS_THRESHOLD } from '@app/redux/constant/wolfCola';
-import { BASE } from '@app/config/api';
+import { NOTIFICATION_ON_REQUEST } from '@app/redux/constant/notification';
+import { PLAY_REQUEST, NEXT_REQUEST, PREVIOUS_REQUEST, SEEK_REQUEST, PLAY_PAUSE_REQUEST, PREVIOUS_THRESHOLD } from '@app/redux/constant/wolfCola';
+import { BASE, BASE_S3 } from '@app/config/api';
+import api from '@app/util/api';
 
 import { current } from '@app/redux/action/current';
 import { queueSet, queueRemove } from '@app/redux/action/queue';
 import { duration } from '@app/redux/action/duration';
 import { playbackPosition } from '@app/redux/action/playbackPosition';
 import { playing } from '@app/redux/action/playing';
-import { initialQueue } from '@app/redux/action/initialQueue';
+import { queueInitial } from '@app/redux/action/queueInitial';
 import { historyPush, historyPop, historyFront } from '@app/redux/action/history';
 import { loading } from '@app/redux/action/loading';
 
 const wolfCola = {
   playingKey: 'current',
+  loadingKey: null,
   current: null,
   next: null,
   crossfadeInProgress: false,
@@ -51,12 +55,7 @@ const howlerEndChannel = key => eventChannel((emitter) => {
 
 const howlerLoadErrorChannel = key => eventChannel((emitter) => {
   wolfCola[key].once('loaderror', (loadError) => {
-    alert({
-      type: 'error',
-      text: 'ወይኔ - unable to load music',
-      time: 5,
-    });
-
+    /* handle song load error */
     wolfCola.crossfadeInProgress = false;
     emitter({ loadError });
     emitter(END);
@@ -67,7 +66,7 @@ const howlerLoadErrorChannel = key => eventChannel((emitter) => {
 
 // checks if there's only one item in the history and the current play matches
 // this behavior is taken from Apple Music
-const playingLastHistory = s => s.history.length === 1 && s.current.songId === s.history[0].songId;
+const playingLastHistory = s => s.history.length === 1 && s.current.track_id === s.history[0].track_id;
 
 // Channel - listens to `end` and clears `end`ed song
 function* howlerEnd(key) {
@@ -79,7 +78,7 @@ function* howlerEnd(key) {
   wolfCola[wolfCola.playingKey].unload();
   wolfCola[wolfCola.playingKey] = null;
   wolfCola.crossfadeInProgress = false;
-  yield put({ type: NEXT });
+  yield put({ type: NEXT_REQUEST });
 }
 
 function* howlerLoadError(key) {
@@ -87,6 +86,12 @@ function* howlerLoadError(key) {
 
   yield take(channel);
   yield put(loading(false));
+  yield put({
+    type: NOTIFICATION_ON_REQUEST,
+    payload: {
+      message: 'Unable to load song. Please try again later',
+    },
+  });
 }
 
 /**
@@ -116,7 +121,9 @@ const tracker = (isTrackerInProgress = false) => {
 
         // checking for crossfade threshold...
         if ((stateCheck.duration - stateCheck.playbackPosition) <= stateCheck.crossfade) {
-          yield put({ type: NEXT });
+          // sending played, [`track_popularity` and `trend`] will be set
+          api(`${BASE}played/${stateCheck.current.track_id}`, stateCheck.user).then(() => {}, () => {});
+          yield put({ type: NEXT_REQUEST });
         }
       }
 
@@ -132,15 +139,22 @@ const tracker = (isTrackerInProgress = false) => {
 // `wolfCola` will only deal with Howl stuff
 const trackerSaga = tracker(false);
 
-function* play(action) {
+function* _play(action) {
+  // double check on `Howl` as it might be killed with `howlerLoadError`
+  if (wolfCola.loadingKey !== null && wolfCola[wolfCola.loadingKey] !== null) {
+    wolfCola[wolfCola.loadingKey].off();
+    wolfCola[wolfCola.loadingKey].unload();
+    wolfCola.loadingKey = null;
+  }
+
   const state = yield select();
   const { payload } = action;
 
   // same song can be in different playlist hence the "optimization" has to be removed
-  yield put(initialQueue(payload.initialQueue));
+  yield put(queueInitial(payload.queueInitial));
   yield put(queueSet(payload.queue));
   if (state.shuffle === true) {
-    yield put(queueRemove(payload.queue.findIndex(song => song.songId === payload.play.songId)));
+    yield put(queueRemove(payload.queue.findIndex(song => song.track_id === payload.play.track_id)));
   }
   yield put(current(payload.play));
 
@@ -163,7 +177,7 @@ function* play(action) {
       wolfCola.current.fade(1, 0, (state.crossfade * 1000));
       // firing `off` and clearing `howlerEnd` fork - avoiding double NEXT #3
       wolfCola.current.off();
-      // on fade completion we'll clear the faded song [if `end` hasn't already cleared it]
+      // on fade completion we'll clear the faded song
       wolfCola.current.once('fade', () => {
         if (wolfCola.current !== null) {
           wolfCola.current.unload();
@@ -220,21 +234,26 @@ function* play(action) {
   // - single song ID whenever it's called
   // - light [no preparation until asked]
   wolfCola[wolfCola.playingKey] = new Howl({
-    src: [`${BASE}/json/playSong.php?id=${payload.play.songId}`],
+    src: [`${BASE_S3}${payload.play.track_track.s3_name}`],
     html5: true,
     autoplay: true,
     format: ['mp3'],
   });
 
+  // when a second `Howl` key is requested, this key [i.e. `loadingKey`] will be used
+  // to `.unload` the previous `Howl` that hasn't finished initializing...mtsm
+  wolfCola.loadingKey = wolfCola.playingKey;
   // ethio-telecom
   yield fork(howlerLoadError, wolfCola.playingKey);
   // if load doesn't resolve Wolf-Cola won't start
   yield promiseifyHowlEvent(wolfCola[wolfCola.playingKey], 'load');
+  // God bless EthioTele
+  wolfCola.loadingKey = null;
   // music loaded
   yield put(loading(false));
   // music loaded, setting duration
   // eslint-disable-next-line
-  yield put(duration(Number.isFinite(wolfCola[wolfCola.playingKey].duration()) ? wolfCola[wolfCola.playingKey].duration() : payload.play.playtime));
+  yield put(duration(Number.isFinite(wolfCola[wolfCola.playingKey].duration()) ? wolfCola[wolfCola.playingKey].duration() : payload.play.track_track.s3_meta.duration));
   // setting playing - USING Howler object [autoplay]
   yield put(playing(wolfCola[wolfCola.playingKey].playing()));
   // fork for `end` lister [with channel]
@@ -242,7 +261,7 @@ function* play(action) {
   yield fork(trackerSaga);
 }
 
-function* seek(action) {
+function* _seek(action) {
   yield call(delay, 64);
   const { payload } = action;
   yield put(playbackPosition(payload));
@@ -252,7 +271,7 @@ function* seek(action) {
   }
 }
 
-function* next() {
+function* _next() {
   const state = yield select();
 
   // nothing playing - halting...
@@ -263,11 +282,11 @@ function* next() {
   // repeat one whatever was playing...
   if (state.repeat === 'ONE') {
     yield put({
-      type: PLAY,
+      type: PLAY_REQUEST,
       payload: {
         play: state.current,
         queue: state.queue,
-        initialQueue: state.initialQueue,
+        queueInitial: state.queueInitial,
       },
     });
 
@@ -285,7 +304,7 @@ function* next() {
 
   // PUSH-ing song to history...
   if (state.current !== null) {
-    const historyIndex = state.history.findIndex(song => song.songId === state.current.songId);
+    const historyIndex = state.history.findIndex(song => song.track_id === state.current.track_id);
 
     if (historyIndex === -1) {
       yield put(historyPush(state.current));
@@ -296,14 +315,14 @@ function* next() {
 
   // played through the entire queue and repeat is `ALL`
   if (state.queue.length === 0 && state.repeat === 'ALL') {
-    const nextPlayIndex = state.shuffle ? random(0)(state.initialQueue.length - 1) : 0;
+    const nextPlayIndex = state.shuffle ? random(0)(state.queueInitial.length - 1) : 0;
 
     yield put({
-      type: PLAY,
+      type: PLAY_REQUEST,
       payload: {
-        play: state.initialQueue[nextPlayIndex],
-        queue: state.initialQueue,
-        initialQueue: state.initialQueue,
+        play: state.queueInitial[nextPlayIndex],
+        queue: state.queueInitial,
+        queueInitial: state.queueInitial,
       },
     });
 
@@ -315,11 +334,11 @@ function* next() {
     const nextPlayIndex = random(0)(state.queue.length - 1);
 
     yield put({
-      type: PLAY,
+      type: PLAY_REQUEST,
       payload: {
         play: state.queue[nextPlayIndex],
         queue: state.queue,
-        initialQueue: state.initialQueue,
+        queueInitial: state.queueInitial,
       },
     });
 
@@ -327,9 +346,9 @@ function* next() {
   }
 
   // `nextPlayIndex` will not be -1 on `findIndex`
-  let nextPlayIndex = state.initialQueue.findIndex(song => song.songId === state.current.songId) + 1;
+  let nextPlayIndex = state.queueInitial.findIndex(song => song.track_id === state.current.track_id) + 1;
 
-  if (nextPlayIndex === state.initialQueue.length) {
+  if (nextPlayIndex === state.queueInitial.length) {
     if (state.repeat === 'ALL') {
       nextPlayIndex = 0;
     } else {
@@ -351,16 +370,16 @@ function* next() {
   }
 
   yield put({
-    type: PLAY,
+    type: PLAY_REQUEST,
     payload: {
-      play: state.initialQueue[nextPlayIndex],
-      queue: state.initialQueue,
-      initialQueue: state.initialQueue,
+      play: state.queueInitial[nextPlayIndex],
+      queue: state.queueInitial,
+      queueInitial: state.queueInitial,
     },
   });
 }
 
-function* previous() {
+function* _previous() {
   const state = yield select();
 
   // nothing playing - halting...
@@ -372,11 +391,11 @@ function* previous() {
   // previous triggered while crossfade > playbackPosition
   if (state.repeat === 'ONE' || (state.playbackPosition > PREVIOUS_THRESHOLD && state.crossfade > state.playbackPosition)) {
     yield put({
-      type: PLAY,
+      type: PLAY_REQUEST,
       payload: {
         play: state.current,
         queue: state.queue,
-        initialQueue: state.initialQueue,
+        queueInitial: state.queueInitial,
       },
     });
 
@@ -397,7 +416,7 @@ function* previous() {
   }
 
   // POP-ing song from history...
-  const historyIndex = state.history.findIndex(song => song.songId === state.history[0].songId);
+  const historyIndex = state.history.findIndex(song => song.track_id === state.history[0].track_id);
 
   if (historyIndex !== -1) {
     yield put(historyPop(historyIndex));
@@ -405,16 +424,16 @@ function* previous() {
 
   // witchcraft!
   yield put({
-    type: PLAY,
+    type: PLAY_REQUEST,
     payload: {
       play: state.history[0],
-      queue: state.shuffle ? [state.history[0], ...state.queue] : [...state.initialQueue],
-      initialQueue: state.initialQueue,
+      queue: state.shuffle ? [state.history[0], ...state.queue] : [...state.queueInitial],
+      queueInitial: state.queueInitial,
     },
   });
 }
 
-function* togglePlayPause() {
+function* _playPause() {
   const state = yield select();
 
   // nothing to pause play here, halting...
@@ -450,30 +469,30 @@ function* togglePlayPause() {
   yield fork(trackerSaga);
 }
 
-function* watchPlay() {
-  yield throttle(1000, PLAY, play);
+function* playRequest() {
+  yield throttle(1000, PLAY_REQUEST, _play);
 }
 
-function* watchSeek() {
-  yield takeLatest(SEEK, seek);
+function* seekRequest() {
+  yield takeLatest(SEEK_REQUEST, _seek);
 }
 
-function* watchNext() {
-  yield throttle(1000, NEXT, next);
+function* nextRequest() {
+  yield throttle(1000, NEXT_REQUEST, _next);
 }
 
-function* watchPrevious() {
-  yield throttle(1000, PREVIOUS, previous);
+function* previousRequest() {
+  yield throttle(1000, PREVIOUS_REQUEST, _previous);
 }
 
-function* watchTogglePlayPause() {
-  yield takeEvery(TOGGLE_PLAY_PAUSE, togglePlayPause);
+function* playPauseRequest() {
+  yield takeEvery(PLAY_PAUSE_REQUEST, _playPause);
 }
 
 module.exports = {
-  watchPlay,
-  watchPrevious,
-  watchNext,
-  watchSeek,
-  watchTogglePlayPause,
+  playRequest,
+  previousRequest,
+  nextRequest,
+  seekRequest,
+  playPauseRequest,
 };
