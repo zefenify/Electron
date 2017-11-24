@@ -8,7 +8,7 @@ import { FAUTH } from '@app/config/api';
 import { SONG_BOOT_REQUEST } from '@app/redux/constant/song';
 import { USER_REQUEST } from '@app/redux/constant/user';
 
-window.facebookLogin = {
+window.FACEBOOK_LOGIN = {
   statusChangeCallback(accessToken) {
     api(`${FAUTH}${accessToken}`).then(({ data }) => {
       store.dispatch({
