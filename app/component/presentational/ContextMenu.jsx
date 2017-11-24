@@ -12,7 +12,7 @@ import Divider from '@app/component/styled/Divider';
 const ContextMenuContainer = styled.div`
   position: fixed;
   right: 0;
-  top: 0;
+  top: 32px;
   bottom: 0;
   width: 250px;
   z-index: 999;
