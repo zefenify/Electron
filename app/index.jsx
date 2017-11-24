@@ -9,6 +9,7 @@ import { ThemeProvider } from 'emotion-theming';
 import '@app/component/styled/Global';
 
 import '@app/util/facebook';
+import '@app/util/mediaKeys';
 import store from '@app/redux/store';
 import { themeLight, themeDark } from '@app/config/theme';
 
