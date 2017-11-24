@@ -44,12 +44,16 @@ const WindowDrag = styled.div`
       align-items: center;
       font-size: 1.5em;
       width: 32px;
-      transform: scale3d(1, 1, 1);
+      transform: translate3d(0, 0, 0);
       transition: transform 128ms;
       will-change: transform;
 
-      &:active {
-        transform: scale3d(0.9, 0.9, 1);
+      &:first-child:active {
+        transform: translate3d(-4px, 0, 0);
+      }
+
+      &:last-child:active {
+        transform: translate3d(4px, 0, 0);
       }
     }
 
