@@ -33,7 +33,6 @@ import SpaceContainer from '@app/component/container/SpaceContainer.jsx';
 
 import Divider from '@app/component/styled/Divider';
 import Spinner from '@app/component/presentational/Spinner';
-import Mobile from '@app/component/presentational/Mobile';
 import { Search, Trending, Settings } from '@app/component/presentational/SVG';
 import WindowDrag from '@app/component/presentational/WindowDrag';
 
@@ -131,7 +130,6 @@ class WolfCola extends Component {
               </WolfColaContainer>
 
               <WindowDrag />
-              <Mobile />
               <ContextOverlayContainer />
               <ContextMenuContainer />
               <SpaceContainer />
