@@ -51,21 +51,6 @@ const SettingsContainer = styled.div`
     flex-direction: column;
     align-items: center;
   }
-
-  .dmca {
-    padding: 0 1em;
-    border: 1px solid red;
-  }
-`;
-
-const DMCA = styled.a`
-  text-decoration: none;
-  color: #ff6d5e;
-  border-radius: 2em;
-  padding: 0.75em 2.75em;
-  font-size: 1em;
-  margin-bottom: 1em;
-  border: 1px solid ${props => props.theme.listText};
 `;
 
 const Settings = ({
@@ -108,8 +93,6 @@ const Settings = ({
             step="1"
           />
         </div>
-
-        <DMCA href="/dmca.html" target="_blank">DMCA</DMCA>
       </SettingsContainer>
     );
   }
@@ -144,8 +127,6 @@ const Settings = ({
           step="1"
         />
       </div>
-
-      <DMCA href="/dmca.html" target="_blank">DMCA</DMCA>
     </SettingsContainer>
   );
 };
