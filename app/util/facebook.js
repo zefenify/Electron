@@ -8,10 +8,9 @@ import { FAUTH } from '@app/config/api';
 import { SONG_BOOT_REQUEST } from '@app/redux/constant/song';
 import { USER_REQUEST } from '@app/redux/constant/user';
 
-const statusChangeCallback = (response) => {
-  // user connected - booting `user`...
-  if (response.status === 'connected') {
-    api(`${FAUTH}${response.authResponse.accessToken}`).then(({ data }) => {
+window.facebookLogin = {
+  statusChangeCallback(accessToken) {
+    api(`${FAUTH}${accessToken}`).then(({ data }) => {
       store.dispatch({
         type: USER_REQUEST,
         payload: data,
@@ -31,17 +30,23 @@ const statusChangeCallback = (response) => {
         },
       });
     });
-  }
-};
+  },
 
-// SDK will be loaded if `userBootFromLF` doesn't find any user
-window.fbAsyncInit = () => {
-  window.FB.init({
-    appId: '470148740022518',
-    cookie: false,
-    xfbml: false,
-    version: 'v2.8',
-  });
-};
+  noAccess() {
+    store.dispatch({
+      type: NOTIFICATION_ON_REQUEST,
+      payload: {
+        message: 'Access was not granted to Zefenify',
+      },
+    });
+  },
 
-module.exports = statusChangeCallback;
+  loadError() {
+    store.dispatch({
+      type: NOTIFICATION_ON_REQUEST,
+      payload: {
+        message: 'Unable to reach Facebook server',
+      },
+    });
+  },
+};

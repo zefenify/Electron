@@ -1,4 +1,3 @@
-/* global window, document */
 /* eslint no-console: off */
 /* eslint no-underscore-dangle: off */
 
@@ -13,18 +12,6 @@ import { user } from '@app/redux/action/user';
 function* userBootFromLF() {
   try {
     const lfUser = yield localforage.getItem(LF_STORE.USER);
-
-    // booting Facebook SDK...
-    if (lfUser === null && window.FB === undefined) {
-      (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) { return; }
-        js = d.createElement(s); js.id = id;
-        js.src = 'https://connect.facebook.net/en_US/sdk.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-    }
-
     yield put(user(lfUser));
   } catch (err) {
     console.warn('Unable to boot user from LF', err);
