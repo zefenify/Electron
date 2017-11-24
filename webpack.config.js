@@ -41,7 +41,7 @@ module.exports = (env) => {
       ],
     },
     output: {
-      filename: '[name].bundle.[hash].js',
+      filename: '[name].bundle.js',
       path: path.join(__dirname, './build'),
     },
     resolve: {
@@ -107,7 +107,7 @@ module.exports = (env) => {
         },
       }),
       new ExtractTextPlugin({
-        filename: '[name].bundle.[hash].css',
+        filename: '[name].bundle.css',
         disable: false,
         allChunks: true,
       }),
