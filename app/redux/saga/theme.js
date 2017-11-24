@@ -17,7 +17,7 @@ function* themeBootFromLF() {
     const WolfColaContainer = document.querySelector('#wolf-cola-container');
     const WolfColaDrag = document.querySelector('#wolf-cola-drag');
     WolfColaContainer.classList.remove('booting');
-    WolfColaDrag.classList.remove('booting');
+    WolfColaDrag.style.transform = 'translate3d(0, 0, 0)';
   } catch (err) {
     console.warn('Unable to boot theme from LF', err);
   }
