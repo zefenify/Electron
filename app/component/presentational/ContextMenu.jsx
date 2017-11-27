@@ -1,3 +1,4 @@
+/* global window */
 import React from 'react';
 import { func, shape } from 'prop-types';
 import styled from 'react-emotion';
@@ -191,9 +192,9 @@ const ContextMenu = ({
           }
 
           <Divider padding="0 0 0 1rem" fontSize="0.8em">Share&nbsp;</Divider>
-          <a onClick={closeContextMenu} href={`https://www.facebook.com/sharer.php?u=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}`} className="link" target="_blank">Facebook</a>
-          <a onClick={closeContextMenu} href={`https://twitter.com/intent/tweet?url=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}&text=${payload.track_name}`} className="link" target="_blank">Twitter</a>
-          <a onClick={closeContextMenu} href={`https://telegram.me/share/url?url=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}&text=${payload.track_name}`} className="link" target="_blank">Telegram</a>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://www.facebook.com/sharer.php?u=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}`); }} className="link">Facebook</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://twitter.com/intent/tweet?url=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}&text=${payload.track_name}`); }} className="link">Twitter</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://telegram.me/share/url?url=${BASE_SHARE}album/${payload.track_album.album_id}/${payload.track_id}&text=${payload.track_name}`); }} className="link">Telegram</ClearButton>
         </ContextMenuContainer>
       );
 
@@ -220,9 +221,9 @@ const ContextMenu = ({
           <ClearButton className="link" disabled={`/album/${payload.album_id}` === history.location.pathname} onClick={() => { closeContextMenu(); history.push(`/album/${payload.album_id}`); }}>Go to Album</ClearButton>
 
           <Divider padding="0 0 0 1rem" fontSize="0.8em">Share&nbsp;</Divider>
-          <a onClick={closeContextMenu} href={`https://www.facebook.com/sharer.php?u=${BASE_SHARE}album/${payload.album_id}`} className="link" target="_blank">Facebook</a>
-          <a onClick={closeContextMenu} href={`https://twitter.com/intent/tweet?url=${BASE_SHARE}album/${payload.album_id}&text=${payload.album_name}`} className="link" target="_blank">Twitter</a>
-          <a onClick={closeContextMenu} href={`https://telegram.me/share/url?url=${BASE_SHARE}album/${payload.album_id}&text=${payload.album_name}`} className="link" target="_blank">Telegram</a>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://www.facebook.com/sharer.php?u=${BASE_SHARE}album/${payload.album_id}`); }} className="link">Facebook</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://twitter.com/intent/tweet?url=${BASE_SHARE}album/${payload.album_id}&text=${payload.album_name}`); }} className="link">Twitter</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://telegram.me/share/url?url=${BASE_SHARE}album/${payload.album_id}&text=${payload.album_name}`); }} className="link">Telegram</ClearButton>
         </ContextMenuContainer>
       );
 
@@ -241,9 +242,9 @@ const ContextMenu = ({
           </div>
 
           <Divider padding="0 0 0 1rem" fontSize="0.8em">Share&nbsp;</Divider>
-          <a onClick={closeContextMenu} href={`https://www.facebook.com/sharer.php?u=${BASE_SHARE}artist/${payload.artist_id}`} className="link" target="_blank">Facebook</a>
-          <a onClick={closeContextMenu} href={`https://twitter.com/intent/tweet?url=${BASE_SHARE}artist/${payload.artist_id}&text=${payload.artist_name}`} className="link" target="_blank">Twitter</a>
-          <a onClick={closeContextMenu} href={`https://telegram.me/share/url?url=${BASE_SHARE}artist/${payload.artist_id}&text=${payload.artist_name}`} className="link" target="_blank">Telegram</a>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://www.facebook.com/sharer.php?u=${BASE_SHARE}artist/${payload.artist_id}`); }} className="link">Facebook</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://twitter.com/intent/tweet?url=${BASE_SHARE}artist/${payload.artist_id}&text=${payload.artist_name}`); }} className="link">Twitter</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://telegram.me/share/url?url=${BASE_SHARE}artist/${payload.artist_id}&text=${payload.artist_name}`); }} className="link">Telegram</ClearButton>
         </ContextMenuContainer>
       );
 
@@ -262,9 +263,9 @@ const ContextMenu = ({
           </div>
 
           <Divider padding="0 0 0 1rem" fontSize="0.8em">Share&nbsp;</Divider>
-          <a onClick={closeContextMenu} href={`https://www.facebook.com/sharer.php?u=${BASE_SHARE}playlist/${payload.playlist_id}`} className="link" target="_blank">Facebook</a>
-          <a onClick={closeContextMenu} href={`https://twitter.com/intent/tweet?url=${BASE_SHARE}playlist/${payload.playlist_id}&text=${payload.playlist_name}`} className="link" target="_blank">Twitter</a>
-          <a onClick={closeContextMenu} href={`https://telegram.me/share/url?url=${BASE_SHARE}playlist/${payload.playlist_id}&text=${payload.playlist_name}`} className="link" target="_blank">Telegram</a>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://www.facebook.com/sharer.php?u=${BASE_SHARE}playlist/${payload.playlist_id}`); }} className="link">Facebook</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://twitter.com/intent/tweet?url=${BASE_SHARE}playlist/${payload.playlist_id}&text=${payload.playlist_name}`); }} className="link">Twitter</ClearButton>
+          <ClearButton onClick={() => { closeContextMenu(); window.linkOpenInSystem(`https://telegram.me/share/url?url=${BASE_SHARE}playlist/${payload.playlist_id}&text=${payload.playlist_name}`); }} className="link">Telegram</ClearButton>
         </ContextMenuContainer>
       );
 
