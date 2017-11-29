@@ -7,7 +7,7 @@
   "presets": [
     [
       "env", {
-        "targets": { "safari": 10, "uglify": false },
+        "targets": { "chrome": 58, "uglify": false },
         "debug": true,
         "useBuiltIns": true
       }
