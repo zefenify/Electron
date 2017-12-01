@@ -29,7 +29,7 @@ const WindowDrag = styled.div`
   .navigation {
     display: flex;
     flex-direction: row;
-    height: 32px;
+    height: 31px;
     margin-left: 200px;
     padding-left: calc(2rem - 12px);
 
