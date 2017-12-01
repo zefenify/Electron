@@ -22,7 +22,6 @@ const WindowDrag = styled.div`
   );
   color: ${props => props.theme.listText};
   -webkit-app-region: drag;
-  border-bottom: 1px solid ${props => props.theme.listDivider};
   transform: translate3d(0, -32px, 0);
   transition: transform 256ms;
   will-change: transform;
@@ -61,6 +60,19 @@ const WindowDrag = styled.div`
       text-align: right;
     }
   }
+
+  .divider {
+    border: none;
+    width: 100%;
+    height: 1px;
+    background-image: linear-gradient(
+      to right,
+      ${props => props.theme.navbarBackground},
+      ${props => props.theme.navbarBackground} 200px,
+      ${props => props.theme.listDivider} 0px,
+      ${props => props.theme.listDivider}
+    );
+  }
 `;
 
 const WindowDragWrapped = ({ history }) => (
@@ -74,6 +86,8 @@ const WindowDragWrapped = ({ history }) => (
         <ChevronRight />
       </ClearButton>
     </div>
+
+    <div className="divider" />
   </WindowDrag>
 );
 
