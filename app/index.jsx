@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { HashRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'emotion-theming';
 
@@ -72,13 +72,12 @@ class WolfCola extends Component {
               <WolfColaContainer className="booting" id="wolf-cola-container">
                 <NavListContainer>
                   <NavContainer>
-                    <Link className="brand" to="/">
-                      <img className="brand-img" alt="zefenify logo" src="static/image/zefenify.png" />
-                      <span>Zefenify</span>
-                      <Spinner loading={this.state.loading} />
-                    </Link>
-
+                    <Spinner loading={this.state.loading} />
                     <div className="nav-list">
+                      <NavLinkStyled exact to="/">
+                        <span>Featured</span>
+                      </NavLinkStyled>
+
                       <NavLinkStyled to="/search">
                         <span>Search</span>
                         <Search style={{ float: 'right' }} />

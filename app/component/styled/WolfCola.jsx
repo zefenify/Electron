@@ -86,7 +86,7 @@ const NavContainer = styled.div`
     position: absolute;
     display: flex;
     flex-direction: column;
-    top: 60px;
+    top: 23px;
     right: 0;
     bottom: 0;
     left: 0;
