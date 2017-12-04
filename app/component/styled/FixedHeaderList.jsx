@@ -12,7 +12,7 @@ const FixedHeaderList = styled.div`
     right: 0;
     left: 0;
     box-shadow: 0 0 4px 2px ${props => props.theme.navBarBoxShadow};
-    height: 60px;
+    height: 57px;
     padding: 0 2em;
     display: flex;
     align-items: center;
@@ -20,7 +20,7 @@ const FixedHeaderList = styled.div`
 
   .list {
     position: absolute;
-    top: 60px;
+    top: 57px;
     right: 0;
     bottom: 0;
     left: 0;

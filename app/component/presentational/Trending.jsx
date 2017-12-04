@@ -16,14 +16,14 @@ const TrendingContainer = styled.div`
     top: 0;
     right: 0;
     left: 0;
-    height: 60px;
+    height: 57px;
     padding: 0 1em;
     box-shadow: 0 0 4px 2px ${props => props.theme.navBarBoxShadow};
   }
 
   .list {
     position: absolute;
-    top: 60px;
+    top: 57px;
     right: 0;
     bottom: 0;
     left: 0;
