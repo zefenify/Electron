@@ -58,30 +58,6 @@ const NavContainer = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
 
-  .brand {
-    position: absolute;
-    left: 0;
-    right: 0;
-    flex: 0 0 60px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    height: 60px;
-    padding-left: 1rem;
-    font-weight: bold;
-    font-size: 1.2em;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: 0 0 4px 2px ${props => props.theme.navBarBoxShadow};
-
-    & > img.brand-img {
-      width: 40px;
-      height: 40px;
-      margin-right: 0.75em;
-    }
-  }
-
   .nav-list {
     position: absolute;
     display: flex;
