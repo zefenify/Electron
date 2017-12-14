@@ -14,7 +14,7 @@ const bounce = keyframes`
 const SpinnerContainer = styled.div`
   position: absolute;
   right: 0.5em;
-  top: 0;
+  top: 4px;
   width: 24px;
   height: 24px;
   background-color: transparent;
