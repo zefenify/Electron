@@ -11,10 +11,12 @@ const bounce = keyframes`
   }
 `;
 
+// left === ReactRouter + Spinner Width
+// top === (32px - 24px) / 2
 const SpinnerContainer = styled.div`
   position: absolute;
-  right: 0.5em;
-  top: 0;
+  left: calc(200px - (0.64rem + 24px));
+  top: 4px;
   width: 24px;
   height: 24px;
   background-color: transparent;

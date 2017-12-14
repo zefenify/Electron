@@ -31,11 +31,10 @@ import ContextMenuContainer from '@app/component/container/ContextMenuContainer'
 import ContextOverlayContainer from '@app/component/container/ContextOverlayContainer';
 import NotificationContainer from '@app/component/container/NotificationContainer';
 import SpaceContainer from '@app/component/container/SpaceContainer.jsx';
+import WindowDrag from '@app/component/container/WindowDrag';
 
 import Divider from '@app/component/styled/Divider';
-import Spinner from '@app/component/presentational/Spinner';
 import { Search, Trending, Settings } from '@app/component/presentational/SVG';
-import WindowDrag from '@app/component/presentational/WindowDrag';
 
 import DJKhaled from '@app/component/hoc/DJKhaled';
 import { WolfColaContainer, NavListContainer, NavContainer, RouteContainer } from '@app/component/styled/WolfCola';
@@ -45,7 +44,6 @@ class WolfCola extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
       theme: 'dark',
     };
   }
@@ -54,7 +52,6 @@ class WolfCola extends Component {
     this.unsubscribe = store.subscribe(() => {
       const state = store.getState();
       this.setState(() => ({
-        loading: state.loading,
         theme: state.theme,
       }));
     });
@@ -73,7 +70,6 @@ class WolfCola extends Component {
               <WolfColaContainer className="booting" id="wolf-cola-container">
                 <NavListContainer>
                   <NavContainer>
-                    <Spinner loading={this.state.loading} />
                     <div className="nav-list">
                       <NavLinkStyled exact to="/">
                         <span>Featured</span>
