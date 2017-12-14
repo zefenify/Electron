@@ -52,7 +52,6 @@ class WolfCola extends Component {
     this.unsubscribe = store.subscribe(() => {
       const state = store.getState();
       this.setState(() => ({
-        loading: state.loading,
         theme: state.theme,
       }));
     });
