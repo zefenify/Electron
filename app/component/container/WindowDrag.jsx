@@ -1,8 +1,11 @@
 import React from 'react';
-import { shape } from 'prop-types';
+import { shape, bool } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import styled from 'react-emotion';
+import { connect } from 'react-redux';
 
+import DJKhaled from '@app/component/hoc/DJKhaled';
+import Spinner from '@app/component/presentational/Spinner';
 import { ChevronLeft, ChevronRight } from '@app/component/presentational/SVG';
 import { ClearButton } from '@app/component/styled/Button';
 
@@ -21,7 +24,6 @@ const WindowDrag = styled.div`
     ${props => props.theme.listBackground}
   );
   color: ${props => props.theme.listText};
-  -webkit-app-region: drag;
   transform: translate3d(0, -32px, 0);
   transition: transform 256ms;
   will-change: transform;
@@ -75,8 +77,10 @@ const WindowDrag = styled.div`
   }
 `;
 
-const WindowDragWrapped = ({ history }) => (
+const WindowDragWrapped = ({ history, loading }) => (
   <WindowDrag id="wolf-cola-drag">
+    <Spinner loading={loading} />
+
     <div className="navigation">
       <ClearButton onClick={() => history.goBack()} className="navigation__back">
         <ChevronLeft />
@@ -93,6 +97,13 @@ const WindowDragWrapped = ({ history }) => (
 
 WindowDragWrapped.propTypes = {
   history: shape({}).isRequired,
+  loading: bool,
 };
 
-module.exports = withRouter(WindowDragWrapped);
+WindowDragWrapped.defaultProps = {
+  loading: false,
+};
+
+module.exports = DJKhaled(connect(state => ({
+  loading: state.loading,
+}))(withRouter(WindowDragWrapped)));
