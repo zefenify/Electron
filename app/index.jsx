@@ -71,7 +71,7 @@ class WolfCola extends Component {
                 <NavListContainer>
                   <NavContainer>
                     <div className="nav-list">
-                      <NavLinkStyled exact to="/">
+                      <NavLinkStyled exact to="/" style={{ marginTop: '0' }}>
                         <span>Featured</span>
                       </NavLinkStyled>
 
