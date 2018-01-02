@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 
 import DJKhaled from '@app/component/hoc/DJKhaled';
 import Spinner from '@app/component/presentational/Spinner';
-import { ChevronLeft, ChevronRight } from '@app/component/presentational/SVG';
+import ChevronLeft from '@app/component/svg/ChevronLeft';
+import ChevronRight from '@app/component/svg/ChevronRight';
 import { ClearButton } from '@app/component/styled/Button';
 
 const WindowDrag = styled.div`

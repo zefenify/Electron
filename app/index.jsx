@@ -34,7 +34,9 @@ import SpaceContainer from '@app/component/container/SpaceContainer.jsx';
 import WindowDrag from '@app/component/container/WindowDrag';
 
 import Divider from '@app/component/styled/Divider';
-import { Search, Trending, Settings } from '@app/component/presentational/SVG';
+import Search from '@app/component/svg/Search';
+import Trending from '@app/component/svg/Trending';
+import Settings from '@app/component/svg/Settings';
 
 import DJKhaled from '@app/component/hoc/DJKhaled';
 import { WolfColaContainer, NavListContainer, NavContainer, RouteContainer } from '@app/component/styled/WolfCola';
