@@ -1,3 +1,4 @@
+/* global window */
 /* eslint no-underscore-dangle: off */
 
 /**
@@ -149,6 +150,7 @@ function* _play(action) {
 
   const state = yield select();
   const { payload } = action;
+  let TRACK_URL = `${BASE_S3}${payload.play.track_track.s3_name}`;
 
   // same song can be in different playlist hence the "optimization" has to be removed
   yield put(queueInitial(payload.queueInitial));
@@ -228,13 +230,19 @@ function* _play(action) {
 
   yield put(loading(true));
 
+  // song + track ID is saved
+  // `fileDownload` will handle the rest i.e. return local absolute path or URL itself
+  if (state.song !== null && state.song.data.song_track.includes(action.payload.play.track_id)) {
+    TRACK_URL = yield window.ELECTRON.fileDownload(TRACK_URL);
+  }
+
   // playing the song - each song will have a Single Howler object that'll be
   // destroyed after each playback - loading all songs (i.e. queue can be costly - I think)
   // single Howler music approach:
   // - single song ID whenever it's called
   // - light [no preparation until asked]
   wolfCola[wolfCola.playingKey] = new Howl({
-    src: [`${BASE_S3}${payload.play.track_track.s3_name}`],
+    src: [TRACK_URL],
     html5: true,
     autoplay: true,
     format: ['mp3'],
