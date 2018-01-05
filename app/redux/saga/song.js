@@ -1,14 +1,38 @@
+/* global window */
 /* eslint no-underscore-dangle: off */
+/* eslint no-console: off */
 
-import { put, select, takeEvery } from 'redux-saga/effects';
+import localforage from 'localforage';
+import { put, fork, select, takeEvery } from 'redux-saga/effects';
 import axios from 'axios';
+import cloneDeep from 'lodash/cloneDeep';
 
-import { BASE, HEADER } from '@app/config/api';
+import { BASE, BASE_S3, HEADER } from '@app/config/api';
+import { LF_STORE } from '@app/config/localforage';
 import { NOTIFICATION_ON_REQUEST } from '@app/redux/constant/notification';
 import { SONG_SAVE_REQUEST, SONG_REMOVE_REQUEST, SONG_BOOT_REQUEST } from '@app/redux/constant/song';
 
+import songTrack from '@app/redux/selector/songTrack';
 import { song } from '@app/redux/action/song';
 import { loading } from '@app/redux/action/loading';
+
+/**
+ * goes through songs -> download via yield, one at a time
+ * call _download via fork
+ *
+ * @param {Array} songs
+ */
+function* _download(songs = []) {
+  let i = 0;
+
+  while (i < songs.length) {
+    if (window.ELECTRON !== undefined) {
+      yield window.ELECTRON.fileDownload(`${BASE_S3}${songs[i].track_track.s3_name}`);
+    }
+
+    i += 1;
+  }
+}
 
 function* songBoot() {
   const { user } = yield select();
@@ -30,6 +54,13 @@ function* songBoot() {
 
     yield put(loading(false));
     yield put(song(response.data));
+
+    try {
+      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+      yield fork(_download, songTrack({ song: response.data }));
+    } catch (err) {
+      console.warn('Unable to save song state to LF', err);
+    }
   } catch (err) {
     yield put(loading(false));
     yield put(song(null));
@@ -93,6 +124,13 @@ function* _songSave(action) {
 
     yield put(loading(false));
     yield put(song(response.data));
+
+    try {
+      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+      yield fork(_download, songTrack({ song: response.data }));
+    } catch (err) {
+      console.warn('Unable to save song state to LF', err);
+    }
   } catch (err) {
     yield put(loading(false));
 
@@ -124,6 +162,7 @@ function* _songRemove(action) {
     return;
   }
 
+  const songPreviousState = cloneDeep(state.song); // to be used if song removal is successful
   const savedTrackIds = state.song.data.song_track;
   const trackId = action.payload.track_id;
 
@@ -148,6 +187,17 @@ function* _songRemove(action) {
 
     yield put(loading(false));
     yield put(song(response.data));
+
+    try {
+      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+
+      if (window.ELECTRON !== undefined) {
+        const { s3, track } = songPreviousState.included;
+        window.ELECTRON.fileDelete(s3[track[trackId].track_track].s3_name);
+      }
+    } catch (err) {
+      console.warn('Unable to save song state to LF', err);
+    }
   } catch (err) {
     yield put(loading(false));
 

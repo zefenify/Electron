@@ -12,6 +12,7 @@ const config = {
     CROSSFADE: 'CROSSFADE',
     REMAINING: 'REMAINING',
     USER: 'USER',
+    SONG: 'SONG',
   },
 };
 
