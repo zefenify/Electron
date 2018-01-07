@@ -232,6 +232,7 @@ function* _play(action) {
 
   // song + track ID is saved
   // `fileDownload` will handle the rest i.e. return local absolute path or URL itself
+  // * GIF: 60% of the time it works EVERYTIME! *
   if (state.song !== null && state.song.data.song_track.includes(action.payload.play.track_id)) {
     TRACK_URL = yield window.ELECTRON.fileDownload(TRACK_URL);
   }

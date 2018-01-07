@@ -56,7 +56,7 @@ function* songBoot() {
     yield put(song(response.data));
 
     try {
-      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+      yield localforage.setItem(LF_STORE.SONG, response.data);
       yield fork(_download, songTrack({ song: response.data }));
     } catch (err) {
       console.warn('Unable to save song state to LF', err);
@@ -126,7 +126,7 @@ function* _songSave(action) {
     yield put(song(response.data));
 
     try {
-      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+      yield localforage.setItem(LF_STORE.SONG, response.data);
       yield fork(_download, songTrack({ song: response.data }));
     } catch (err) {
       console.warn('Unable to save song state to LF', err);
@@ -189,7 +189,7 @@ function* _songRemove(action) {
     yield put(song(response.data));
 
     try {
-      yield localforage.setItem(LF_STORE.SONG, songTrack({ song: response.data }));
+      yield localforage.setItem(LF_STORE.SONG, response.data);
 
       if (window.ELECTRON !== undefined) {
         const { s3, track } = songPreviousState.included;
