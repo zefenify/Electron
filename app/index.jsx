@@ -53,9 +53,13 @@ class WolfCola extends Component {
   componentDidMount() {
     this.unsubscribe = store.subscribe(() => {
       const state = store.getState();
-      this.setState(() => ({
-        theme: state.theme,
-      }));
+
+      // avoiding `shouldComponentUpdate` hook...
+      if (state.theme !== this.state.theme) {
+        this.setState(() => ({
+          theme: state.theme,
+        }));
+      }
     });
   }
 
