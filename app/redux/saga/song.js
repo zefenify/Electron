@@ -63,6 +63,16 @@ function* songBoot() {
     }
   } catch (err) {
     yield put(loading(false));
+
+    // checking for LF saved state...
+    const songLF = yield localforage.getItem(LF_STORE.SONG);
+
+    // we have saved stated inside `LF_STORE.SONG`...
+    if (songLF !== null) {
+      yield put(song(songLF));
+      return;
+    }
+
     yield put(song(null));
 
     if (err.message === 'Network Error') {
