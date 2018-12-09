@@ -7,7 +7,7 @@ module.exports = {
     app: './app/index.jsx',
   },
   output: {
-    filename: '[name].[hash].js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
