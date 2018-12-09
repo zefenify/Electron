@@ -1,38 +1,34 @@
 /* eslint no-console: off */
-/* eslint no-underscore-dangle: off */
 
 import localforage from 'localforage';
 import { put, takeEvery } from 'redux-saga/effects';
 
-import { LF_STORE } from '@app/config/localforage';
+import { LOCALFORAGE_STORE } from '@app/config/localforage';
 import { USER_REQUEST } from '@app/redux/constant/user';
-
 import { user } from '@app/redux/action/user';
 
-function* userBootFromLF() {
+
+export function* userBootFromLocalforage() {
   try {
-    const lfUser = yield localforage.getItem(LF_STORE.USER);
-    yield put(user(lfUser));
-  } catch (err) {
-    console.warn('Unable to boot user from LF', err);
+    const localforageUser = yield localforage.getItem(LOCALFORAGE_STORE.USER);
+    yield put(user(localforageUser));
+  } catch (userGetError) {
+    console.warn('Unable to Boot User from Localforage', userGetError);
   }
 }
+
 
 function* _user(action) {
   yield put(user(action.payload));
 
   try {
-    yield localforage.setItem(LF_STORE.USER, action.payload);
-  } catch (err) {
-    console.warn('Unable to save user state to LF', err);
+    yield localforage.setItem(LOCALFORAGE_STORE.USER, action.payload);
+  } catch (userSetError) {
+    console.warn('Unable to save User State to Localforage', userSetError);
   }
 }
 
-function* userRequest() {
+
+export function* userRequest() {
   yield takeEvery(USER_REQUEST, _user);
 }
-
-module.exports = {
-  userBootFromLF,
-  userRequest,
-};

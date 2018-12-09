@@ -16,4 +16,4 @@ const ChevronLeft = props => (
   </svg>
 );
 
-module.exports = ChevronLeft;
+export default ChevronLeft;

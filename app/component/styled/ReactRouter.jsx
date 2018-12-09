@@ -1,31 +1,31 @@
 import { Link, NavLink } from 'react-router-dom';
 import styled from 'react-emotion';
 
-const NavLinkStyled = styled(NavLink)`
-  color: ${props => props.theme.navbarText};
-  padding: 0.5em 0.64rem;
-  margin: 0.25em 0;
+
+export const NavLinkStyled = styled(NavLink)`
+  color: ${props => props.theme.NATURAL_2};
   font-weight: bold;
   text-decoration: none;
   border-left: 6px solid transparent;
   cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0 !important;
+  height: 36px;
 
   &:hover {
-    color: ${props => props.theme.navbarTextActive};
+    color: ${props => props.theme.PRIMARY_4};
   }
 
   &.active {
-    color: ${props => props.theme.navbarTextActive};
-    border-left: 6px solid ${props => props.theme.primary};
-    background-color: ${props => props.theme.listBackgroundHover};
+    color: ${props => props.theme.NATURAL_2};
+    border-left: 6px solid ${props => props.theme.PRIMARY_4};
+    background-color: ${props => props.theme.NATURAL_6};
   }
 `;
 
-const LinkStyled = styled(Link)`
+
+export const LinkStyled = styled(Link)`
   text-decoration: none;
 `;
-
-module.exports = {
-  NavLinkStyled,
-  LinkStyled,
-};

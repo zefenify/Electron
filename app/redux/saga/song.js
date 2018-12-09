@@ -1,20 +1,19 @@
 /* global window */
-/* eslint no-underscore-dangle: off */
-/* eslint no-console: off */
-
-import localforage from 'localforage';
-import { put, fork, select, takeEvery } from 'redux-saga/effects';
+import {
+  put,
+  fork,
+  select,
+  takeEvery,
+} from 'redux-saga/effects';
 import axios from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { BASE, BASE_S3, HEADER } from '@app/config/api';
-import { LF_STORE } from '@app/config/localforage';
 import { NOTIFICATION_ON_REQUEST } from '@app/redux/constant/notification';
 import { SONG_SAVE_REQUEST, SONG_REMOVE_REQUEST, SONG_BOOT_REQUEST } from '@app/redux/constant/song';
-
 import songTrack from '@app/redux/selector/songTrack';
 import { song } from '@app/redux/action/song';
 import { loading } from '@app/redux/action/loading';
+
 
 /**
  * goes through songs -> download via yield, one at a time
@@ -25,16 +24,16 @@ import { loading } from '@app/redux/action/loading';
 function* _download(songs = []) {
   let i = 0;
 
-  while (i < songs.length) {
-    if (window.ELECTRON !== undefined) {
+  if (window.ELECTRON !== undefined) {
+    while (i < songs.length) {
       yield window.ELECTRON.fileDownload(`${BASE_S3}${songs[i].track_track.s3_name}`);
+      i += 1;
     }
-
-    i += 1;
   }
 }
 
-function* songBoot() {
+
+export function* songBoot() {
   const { user } = yield select();
 
   // no user, clearing song state...
@@ -46,40 +45,24 @@ function* songBoot() {
   try {
     yield put(loading(true));
 
-    const response = yield axios.get(`${BASE}songs`, {
+    const { data } = yield axios.get(`${BASE}song/like`, {
       headers: {
         [HEADER]: user === null ? undefined : user.jwt,
       },
     });
 
     yield put(loading(false));
-    yield put(song(response.data));
-
-    try {
-      yield localforage.setItem(LF_STORE.SONG, response.data);
-      yield fork(_download, songTrack({ song: response.data }));
-    } catch (err) {
-      console.warn('Unable to save song state to LF', err);
-    }
-  } catch (err) {
+    yield put(song(data));
+    yield fork(_download, songTrack({ song: data }));
+  } catch (songsError) {
     yield put(loading(false));
-
-    // checking for LF saved state...
-    const songLF = yield localforage.getItem(LF_STORE.SONG);
-
-    // we have saved stated inside `LF_STORE.SONG`...
-    if (songLF !== null) {
-      yield put(song(songLF));
-      return;
-    }
-
     yield put(song(null));
 
-    if (err.message === 'Network Error') {
+    if (songsError.message === 'Network Error') {
       yield put({
         type: NOTIFICATION_ON_REQUEST,
         payload: {
-          message: 'No Internet connection. Please try again later',
+          message: 'No Internet Connection. Please Try Again Later',
         },
       });
 
@@ -89,11 +72,12 @@ function* songBoot() {
     yield put({
       type: NOTIFICATION_ON_REQUEST,
       payload: {
-        message: 'ይቅርታ, unable to fetch Your Library',
+        message: 'ይቅርታ, Unable to Fetch Your Library',
       },
     });
   }
 }
+
 
 function* _songSave(action) {
   const state = yield select();
@@ -113,7 +97,7 @@ function* _songSave(action) {
   try {
     yield put(loading(true));
 
-    const response = yield axios.patch(`${BASE}songs`, {
+    const { data } = yield axios.patch(`${BASE}song/like`, {
       song_track: [trackId, ...savedTrackIds],
     }, {
       headers: {
@@ -122,37 +106,31 @@ function* _songSave(action) {
     });
 
     yield put(loading(false));
-    yield put(song(response.data));
-
-    try {
-      yield localforage.setItem(LF_STORE.SONG, response.data);
-      yield fork(_download, songTrack({ song: response.data }));
-    } catch (err) {
-      console.warn('Unable to save song state to LF', err);
-    }
-  } catch (err) {
+    yield put(song(data));
+    yield fork(_download, songTrack({ song: data }));
+  } catch (songsSaveError) {
     yield put(loading(false));
 
-    if (err.message === 'Network Error') {
+    if (songsSaveError.message === 'Network Error') {
       yield put({
         type: NOTIFICATION_ON_REQUEST,
         payload: {
-          message: 'No Internet connection. Please try again later',
+          message: 'No Internet Connection. Please Try Again Later',
         },
       });
 
       return;
     }
 
-
     yield put({
       type: NOTIFICATION_ON_REQUEST,
       payload: {
-        message: 'ይቅርታ, Unable to save song to Your Library',
+        message: 'ይቅርታ, Unable to save Song to Your Library',
       },
     });
   }
 }
+
 
 function* _songRemove(action) {
   const state = yield select();
@@ -161,7 +139,6 @@ function* _songRemove(action) {
     return;
   }
 
-  const songPreviousState = cloneDeep(state.song); // to be used if song removal is successful
   const savedTrackIds = state.song.data.song_track;
   const trackId = action.payload.track_id;
 
@@ -173,7 +150,7 @@ function* _songRemove(action) {
   try {
     yield put(loading(true));
 
-    const response = yield axios.patch(`${BASE}songs`, {
+    const { data } = yield axios.patch(`${BASE}song/like`, {
       song_track: [
         ...savedTrackIds.slice(0, savedTrackIds.indexOf(trackId)),
         ...savedTrackIds.slice(savedTrackIds.indexOf(trackId) + 1),
@@ -185,26 +162,15 @@ function* _songRemove(action) {
     });
 
     yield put(loading(false));
-    yield put(song(response.data));
-
-    try {
-      yield localforage.setItem(LF_STORE.SONG, response.data);
-
-      if (window.ELECTRON !== undefined) {
-        const { s3, track } = songPreviousState.included;
-        window.ELECTRON.fileDelete(s3[track[trackId].track_track].s3_name);
-      }
-    } catch (err) {
-      console.warn('Unable to save song state to LF', err);
-    }
-  } catch (err) {
+    yield put(song(data));
+  } catch (songRemoveError) {
     yield put(loading(false));
 
-    if (err.message === 'Network Error') {
+    if (songRemoveError.message === 'Network Error') {
       yield put({
         type: NOTIFICATION_ON_REQUEST,
         payload: {
-          message: 'No Internet connection. Please try again later',
+          message: 'No Internet Connection. Please Try Again Later',
         },
       });
 
@@ -214,27 +180,23 @@ function* _songRemove(action) {
     yield put({
       type: NOTIFICATION_ON_REQUEST,
       payload: {
-        message: 'ይቅርታ, Unable to remove song from Your Library',
+        message: 'ይቅርታ, Unable to Remove Song from Your Library',
       },
     });
   }
 }
 
-function* songBootRequest() {
+
+export function* songBootRequest() {
   yield takeEvery(SONG_BOOT_REQUEST, songBoot);
 }
 
-function* songSaveRequest() {
+
+export function* songSaveRequest() {
   yield takeEvery(SONG_SAVE_REQUEST, _songSave);
 }
 
-function* songRemoveRequest() {
+
+export function* songRemoveRequest() {
   yield takeEvery(SONG_REMOVE_REQUEST, _songRemove);
 }
-
-module.exports = {
-  songBoot,
-  songBootRequest,
-  songSaveRequest,
-  songRemoveRequest,
-};

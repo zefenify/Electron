@@ -1,12 +1,9 @@
 import { SHUFFLE } from '@app/redux/constant/shuffle';
 
-function shuffle(payload) {
+
+export function shuffle(payload) {
   return {
     type: SHUFFLE,
     payload,
   };
 }
-
-module.exports = {
-  shuffle,
-};

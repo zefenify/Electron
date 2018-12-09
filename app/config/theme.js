@@ -1,67 +1,45 @@
-const DARK_1 = '#121212';
-const DARK_2 = '#181818';
-const DARK_3 = '#282828';
-const DARK_4 = '#ededed';
-const DARK_5 = '#657786';
-const DARK_6 = '#000000';
+export const DARK = {
+  BACKGROUND_MAIN: 'hsl(0, 0%, 11%)',
+  BACKGROUND_NAVIGATION: 'hsl(0, 0%, 16%)',
+  BACKGROUND_CONTROL: 'hsl(0, 0%, 15%)',
+  SHADOW: 'hsla(0, 0%, 0%, 0.2)',
 
-const MUTE_1 = '#a0a0a0';
-const MUTE_2 = '#282828';
-const MUTE_3 = '#404040';
-const MUTE_4 = '#ececec';
-const MUTE_5 = '#a1a1a1';
-const MUTE_6 = '#4e4e4e';
-const MUTE_7 = '#333333';
+  PRIMARY_1: '#EFF8FF',
+  PRIMARY_2: '#BCDEFA',
+  PRIMARY_3: '#6CB2EB',
+  PRIMARY_4: '#3490DC',
+  PRIMARY_5: '#2779BD',
+  PRIMARY_6: '#1C3D5A',
+  PRIMARY_7: '#12283A',
 
-const WHITE_1 = '#ffffff';
-const WHITE_2 = '#f7f7f7';
-const WHITE_3 = '#d8d8d8';
+  NATURAL_1: '#F1F5F8',
+  NATURAL_2: '#DAE1E7',
+  NATURAL_3: '#B8C2CC',
+  NATURAL_4: '#8795A1',
+  NATURAL_5: '#606F7B',
+  NATURAL_6: '#3D4852',
+  NATURAL_7: '#22292F',
+};
 
-const PRIMARY_1 = '#2196f3';
-const PRIMARY_2 = '#e30047';
+export const LIGHT = {
+  BACKGROUND_MAIN: 'hsl(0, 0%, 100%)',
+  BACKGROUND_NAVIGATION: 'hsl(0, 0%, 93%)',
+  BACKGROUND_CONTROL: 'hsl(180, 0%, 86%)',
+  SHADOW: 'hsla(100, 0%, 0%, 0.2)',
 
-module.exports = {
-  themeDark: {
-    primary: PRIMARY_1,
+  PRIMARY_1: '#3B0D0C',
+  PRIMARY_2: '#621B18',
+  PRIMARY_3: '#CC1F1A',
+  PRIMARY_4: '#E3342F',
+  PRIMARY_5: '#EF5753',
+  PRIMARY_6: '#F9ACAA',
+  PRIMARY_7: '#FCEBEA',
 
-    navbarBackground: DARK_1,
-    navbarText: MUTE_1,
-    navbarTextActive: WHITE_1,
-    navBarBoxShadow: DARK_6,
-
-    listBackground: DARK_2,
-    listBackgroundHover: MUTE_2,
-    listDivider: MUTE_2,
-    listDividerText: MUTE_7,
-    listText: WHITE_1,
-    listTextMute: MUTE_1,
-    listTextActive: PRIMARY_1,
-    listBoxShadow: DARK_6,
-
-    controlBackground: DARK_3,
-    controlText: WHITE_1,
-    controlMute: MUTE_1,
-  },
-
-  themeLight: {
-    primary: PRIMARY_2,
-
-    navbarBackground: WHITE_2,
-    navbarText: MUTE_3,
-    navbarTextActive: MUTE_2,
-    navBarBoxShadow: WHITE_3,
-
-    listBackground: WHITE_1,
-    listBackgroundHover: DARK_4,
-    listDivider: DARK_4,
-    listDividerText: MUTE_5,
-    listText: MUTE_6,
-    listTextMute: MUTE_4,
-    listTextActive: PRIMARY_2,
-    listBoxShadow: DARK_5,
-
-    controlBackground: DARK_4,
-    controlText: MUTE_6,
-    controlMute: MUTE_5,
-  },
+  NATURAL_1: '#22292F',
+  NATURAL_2: '#3D4852',
+  NATURAL_3: '#606F7B',
+  NATURAL_4: '#8795A1',
+  NATURAL_5: '#B8C2CC',
+  NATURAL_6: '#DAE1E7',
+  NATURAL_7: '#F1F5F8',
 };

@@ -1,35 +1,31 @@
-import React from 'react';
-import { string, arrayOf, shape } from 'prop-types';
+import React, { memo, Fragment } from 'react';
+import { arrayOf, shape } from 'prop-types';
 import { Link } from 'react-router-dom';
-import styled from 'react-emotion';
+import isEqual from 'react-fast-compare';
 
-const Muted = styled.span`
-  color: ${props => props.theme.controlMute};
-`;
 
-const ArtistList = ({
-  className,
-  artists,
-}) => (
-  <span className={className}>
+const ArtistList = ({ artist }) => (
+  <Fragment>
     {
-      artists.map((artist, index) => (
-        <Link to={`/artist/${artist.artist_id}`}>
-          <span>{artist.artist_name}</span>{ (artists.length > 1 && (index < artists.length - 1)) ? <span>{ (index < artists.length - 2) ? <Muted>,</Muted> : <Muted>&nbsp;&amp;</Muted> } </span> : null }
+      artist.map((_artist, index) => (
+        <Link to={`/artist/${_artist.artist_id}`} key={_artist.artist_id}>
+          <span>{_artist.artist_name}</span>{ (artist.length > 1 && (index < artist.length - 1)) ? <span>{ (index < artist.length - 2) ? <span>,</span> : <span>&nbsp;&amp;</span> } </span> : null }
         </Link>
       ))
     }
-  </span>
+  </Fragment>
 );
 
 ArtistList.propTypes = {
-  className: string,
-  artists: arrayOf(shape({})),
+  artist: arrayOf(shape({})),
 };
 
 ArtistList.defaultProps = {
-  className: '',
-  artists: [],
+  artist: [],
 };
 
-module.exports = ArtistList;
+export default memo(ArtistList, (previousProps, nextProps) => isEqual({
+  artist: previousProps.artist,
+}, {
+  artist: nextProps.artist,
+}));

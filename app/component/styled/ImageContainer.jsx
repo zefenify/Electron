@@ -2,16 +2,17 @@ import React from 'react';
 import { element } from 'prop-types';
 import styled from 'react-emotion';
 
+
 // this component prevents empty box while image is loading
 //
 // PS:
 // all images on Zefenify are square
 const ImageContainer = styled.div`
   position: relative;
-  border: 1px solid ${props => props.border ? props.border : props.theme.listDivider};
-  border-radius: ${props => props.borderRadius ? props.borderRadius : '6px'};
+  border: 1px solid ${props => props.border || props.theme.NATURAL_7};
+  border-radius: ${props => props.borderRadius || '6px'};
 
-  .container {
+  .ImageContainer__image-container {
     position: relative;
     height: 0;
     padding-bottom: 100%;
@@ -25,18 +26,23 @@ const ImageContainer = styled.div`
       left: 0;
       width: 100%;
       height: 100%;
-      border-radius: ${props => props.borderRadius ? props.borderRadius : '6px'};
+      border-radius: ${props => props.borderRadius || '6px'};
+      box-shadow: 0 2px 6px ${props => props.theme.SHADOW};
     }
   }
 `;
 
-const Container = props => (
-  <ImageContainer {...props}>
-    <div className="container">
-      { props.children }
-    </div>
-  </ImageContainer>
-);
+const Container = (props) => {
+  const { children, ...otherProps } = props;
+
+  return (
+    <ImageContainer {...otherProps}>
+      <div className="ImageContainer__image-container">
+        { children }
+      </div>
+    </ImageContainer>
+  );
+};
 
 Container.propTypes = {
   children: element,
@@ -46,4 +52,5 @@ Container.defaultProps = {
   children: null,
 };
 
-module.exports = Container;
+
+export default Container;

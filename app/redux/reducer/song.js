@@ -1,5 +1,6 @@
 import { SONG } from '@app/redux/constant/song';
 
+
 function song(state = null, action) {
   switch (action.type) {
     case SONG:
@@ -10,4 +11,5 @@ function song(state = null, action) {
   }
 }
 
-module.exports = song;
+
+export default song;

@@ -2,6 +2,7 @@ import React from 'react';
 import { func } from 'prop-types';
 import styled from 'react-emotion';
 
+
 const ContextOverlayContainer = styled.div`
   position: fixed;
   top: 0;
@@ -12,11 +13,11 @@ const ContextOverlayContainer = styled.div`
 `;
 
 const ContextOverlay = ({
-  closeContextMenu,
-}) => <ContextOverlayContainer id="context-overlay-container" onClick={closeContextMenu} />;
+  contextMenuClose,
+}) => <ContextOverlayContainer id="context-overlay-container" onClick={contextMenuClose} />;
 
 ContextOverlay.propTypes = {
-  closeContextMenu: func.isRequired,
+  contextMenuClose: func.isRequired,
 };
 
-module.exports = ContextOverlay;
+export default ContextOverlay;

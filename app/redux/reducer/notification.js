@@ -1,5 +1,6 @@
 import { NOTIFICATION } from '@app/redux/constant/notification';
 
+
 function notification(state = null, action) {
   switch (action.type) {
     case NOTIFICATION:
@@ -10,4 +11,5 @@ function notification(state = null, action) {
   }
 }
 
-module.exports = notification;
+
+export default notification;

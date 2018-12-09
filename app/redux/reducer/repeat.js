@@ -1,5 +1,6 @@
 import { REPEAT } from '@app/redux/constant/repeat';
 
+
 function reducer(state = 'ALL', action) {
   switch (action.type) {
     case REPEAT:
@@ -10,4 +11,5 @@ function reducer(state = 'ALL', action) {
   }
 }
 
-module.exports = reducer;
+
+export default reducer;

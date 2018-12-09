@@ -1,5 +1,1 @@
-const LOADING = 'LOADING';
-
-module.exports = {
-  LOADING,
-};
+export const LOADING = 'LOADING';

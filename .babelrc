@@ -1,17 +1,15 @@
 {
   "plugins": [
-    "emotion",
-    "transform-react-inline-elements",
-    ["transform-runtime", { "helpers": false, "polyfill": false }]
+    "emotion"
   ],
   "presets": [
     [
-      "env", {
-        "targets": { "chrome": 58, "uglify": false },
+      "@babel/preset-env", {
+        "targets": { "chrome": 66 },
         "debug": true,
-        "useBuiltIns": true
+        "useBuiltIns": false
       }
     ],
-    "react",
+    "@babel/react"
   ]
 }

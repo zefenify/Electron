@@ -1,56 +1,151 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { VOLUME_REQUEST } from '@app/redux/constant/volume';
 import { REPEAT_REQUEST } from '@app/redux/constant/repeat';
 import { SHUFFLE_REQUEST } from '@app/redux/constant/shuffle';
 import { REMAINING_REQUEST } from '@app/redux/constant/remaining';
-import { NEXT_REQUEST, PREVIOUS_REQUEST, SEEK_REQUEST, PLAY_PAUSE_REQUEST } from '@app/redux/constant/wolfCola';
-
-import DJKhaled from '@app/component/hoc/DJKhaled';
+import {
+  NEXT_REQUEST,
+  PREVIOUS_REQUEST,
+  SEEK_REQUEST,
+  PLAY_PAUSE_REQUEST,
+} from '@app/redux/constant/wolfCola';
+import { SONG_SAVE_REQUEST, SONG_REMOVE_REQUEST } from '@app/redux/constant/song';
+import store from '@app/redux/store';
 import Control from '@app/component/presentational/Control';
+import { Context } from '@app/component/context/context';
 
-const ControlContainer = props => (<Control {...props} />);
 
-module.exports = DJKhaled(connect(state => ({
-  current: state.current,
-  duration: state.duration,
-  playbackPosition: state.playbackPosition,
-  playing: state.playing,
-  shuffle: state.shuffle,
-  repeat: state.repeat,
-  volume: state.volume,
-  remaining: state.remaining,
-  urlCurrentPlaying: state.urlCurrentPlaying,
-}), dispatch => () => ({
-  seek(e) {
-    dispatch({ type: SEEK_REQUEST, payload: Number.parseInt(e.target.value, 10) });
+const dispatches = {
+  seek(event) {
+    store.dispatch({
+      type: SEEK_REQUEST,
+      payload: Number.parseInt(event.target.value, 10),
+    });
   },
+
   togglePlayPause() {
-    dispatch({ type: PLAY_PAUSE_REQUEST });
+    store.dispatch({
+      type: PLAY_PAUSE_REQUEST,
+    });
   },
+
   next() {
-    dispatch({ type: NEXT_REQUEST });
+    store.dispatch({
+      type: NEXT_REQUEST,
+    });
   },
+
   previous() {
-    dispatch({ type: PREVIOUS_REQUEST });
+    store.dispatch({
+      type: PREVIOUS_REQUEST,
+    });
   },
+
   toggleShuffle() {
-    dispatch({ type: SHUFFLE_REQUEST });
+    store.dispatch({
+      type: SHUFFLE_REQUEST,
+    });
   },
+
   toggleRemaining() {
-    dispatch({ type: REMAINING_REQUEST });
+    store.dispatch({
+      type: REMAINING_REQUEST,
+    });
   },
+
   setRepeat() {
-    dispatch({ type: REPEAT_REQUEST });
+    store.dispatch({
+      type: REPEAT_REQUEST,
+    });
   },
-  setVolume(e) {
-    dispatch({ type: VOLUME_REQUEST, payload: Number.parseFloat(e.target.value) });
+
+  setVolume(event) {
+    store.dispatch({
+      type: VOLUME_REQUEST,
+      payload: Number.parseFloat(event.target.value),
+    });
   },
+
   muteVolume() {
-    dispatch({ type: VOLUME_REQUEST, payload: 0 });
+    store.dispatch({
+      type: VOLUME_REQUEST,
+      payload: 0,
+    });
   },
+
   maxVolume() {
-    dispatch({ type: VOLUME_REQUEST, payload: 1 });
+    store.dispatch({
+      type: VOLUME_REQUEST,
+      payload: 1,
+    });
   },
-}))(ControlContainer));
+};
+
+
+const ControlContainer = () => {
+  const {
+    current,
+    duration,
+    playbackPosition,
+    playing,
+    shuffle,
+    repeat,
+    volume,
+    remaining,
+    urlCurrentPlaying,
+    queueNext,
+    song,
+  } = useContext(Context);
+  const [state, setState] = useState({
+    liked: false,
+  });
+
+  useEffect(() => {
+    if (song === null || current === null) {
+      setState(Object.assign(state, {
+        like: false,
+      }));
+
+      return;
+    }
+
+    setState(Object.assign(state, {
+      like: Object.keys(song.included.track).includes(current.track_id),
+    }));
+  }, [song === null ? song : song.included.track, current === null ? current : current.track_id]);
+
+  const likeTrackToggle = () => {
+    const { like } = state;
+
+    // optimistic update
+    setState(Object.assign(state, {
+      like: !like,
+    }));
+
+    store.dispatch({
+      type: like === true ? SONG_REMOVE_REQUEST : SONG_SAVE_REQUEST,
+      payload: current,
+    });
+  };
+
+  return (
+    <Control
+      queueNext={queueNext}
+      current={current}
+      duration={duration}
+      playbackPosition={playbackPosition}
+      playing={playing}
+      shuffle={shuffle}
+      repeat={repeat}
+      volume={volume}
+      remaining={remaining}
+      urlCurrentPlaying={urlCurrentPlaying}
+      likeTrackToggle={likeTrackToggle}
+      {...state}
+      {...dispatches}
+    />
+  );
+};
+
+export default ControlContainer;

@@ -1,44 +1,53 @@
-import React from 'react';
-import { string, bool, func, number, shape, oneOf } from 'prop-types';
+import React, { memo } from 'react';
+import {
+  string,
+  bool,
+  func,
+  number,
+  shape,
+  oneOf,
+} from 'prop-types';
 import { Link } from 'react-router-dom';
 import styled from 'react-emotion';
+import isEqual from 'react-fast-compare';
 
 import { BASE_S3 } from '@app/config/api';
-
 import PlayPause from '@app/component/svg/PlayPause';
 import ImageContainer from '@app/component/styled/ImageContainer';
 
+
 const PlaylistContainer = styled(Link)`
   position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 25%;
-  padding: 0 1em;
-  margin-bottom: 3em;
+  width: 25%;
   text-decoration: none;
-  color: inherit;
+  color: ${props => props.theme.PRIMARY_4};
   transition: transform 128ms;
-  will-change: transform;
 
   &.active {
-    color: ${props => props.theme.primary};
+    .PlaylistContainer__title {
+      color: ${props => props.theme.PRIMARY_4};
+    }
 
-    .playlist-title {
-      color: ${props => props.theme.primary};
+    .PlaylistContainer__description {
+      color: ${props => props.theme.PRIMARY_4};
+    }
+
+    .PlaylistContainer__count {
+      color: ${props => props.theme.PRIMARY_5};
     }
   }
 
   &:not(.active) {
     svg {
-      color: #fff !important;
+      color: hsl(0, 0%, 100%) !important;
     }
   }
 
   @media(min-width: 1282px) {
-    flex: 0 0 20%;
+    width: 20%;
   }
 
-  .playlist-cover {
+  .PlaylistContainer__cover {
     position: relative;
 
     &__overlay {
@@ -47,53 +56,37 @@ const PlaylistContainer = styled(Link)`
       right: 0;
       bottom: 0;
       left: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       background-color: rgba(51, 51, 51, 0.75);
       border-radius: 6px;
 
       svg {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         color: inherit;
         width: 64px;
         height: 64px;
       }
     }
 
-    .playlist-cover__overlay {
+    .PlaylistContainer__cover__overlay {
       opacity: 0;
     }
 
-    &:hover .playlist-cover__overlay {
+    &:hover .PlaylistContainer__cover__overlay {
       opacity: 1;
     }
   }
 
-  .playlist-title {
-    padding: 0;
-    margin: 0;
-    line-height: 125%;
+  .PlaylistContainer__title {
     font-size: 1.25em;
     font-weight: bold;
-    margin-top: 0.5em;
+    color: ${props => props.theme.NATURAL_2};
   }
 
-  .playlist-description {
-    padding: 0;
-    margin: 0;
-    margin-top: 0.5em;
-    line-height: 1.25em;
-    color: ${props => props.theme.controlMute};
+  .PlaylistContainer__description {
+    color: ${props => props.theme.NATURAL_2};
   }
 
-  .playlist-count {
-    padding: 0;
-    margin: 0;
-    margin-top: 0.5em;
-    color: ${props => props.theme.controlMute};
+  .PlaylistContainer__count {
+    color: ${props => props.theme.NATURAL_4};
   }
 
   &:active {
@@ -101,44 +94,44 @@ const PlaylistContainer = styled(Link)`
   }
 `;
 
-function Playlist({
+
+const Playlist = ({
   type,
   id,
   playing,
-  playingId,
+  active,
   name,
   description,
   trackCount,
   cover,
   play,
-}) {
-  return (
-    <PlaylistContainer to={`/${type}/${id}`} className={`${id === playingId ? 'active' : ''}`}>
-      <div className="playlist-cover">
-        <ImageContainer>
-          <img src={`${BASE_S3}${cover.s3_name}`} alt={name} />
-        </ImageContainer>
+}) => (
+  <PlaylistContainer to={`/${type}/${id}`} className={`d-flex flex-column flex-shrink-0 pt-0 px-3 pb-4 ${active === true ? 'active' : ''}`}>
+    <div className="PlaylistContainer__cover">
+      <ImageContainer>
+        <img src={`${BASE_S3}${cover.s3_name}`} alt={name} />
+      </ImageContainer>
 
-        <div className="playlist-cover__overlay">
-          <PlayPause
-            onClick={(e) => { e.preventDefault(); play(id); }}
-            playing={id === playingId && playing}
-          />
-        </div>
+      <div className="d-flex align-items-center justify-content-center PlaylistContainer__cover__overlay">
+        <PlayPause
+          strokeWidth="1px"
+          playing={playing}
+          onClick={(event) => { event.preventDefault(); play(id); }}
+        />
       </div>
+    </div>
 
-      <strong className="playlist-title">{ name }</strong>
-      <p className="playlist-description">{ description }</p>
-      <small className="playlist-count">{`${trackCount} SONG${trackCount > 1 ? 'S' : ''}`}</small>
-    </PlaylistContainer>
-  );
-}
+    <strong className="m-0 p-0 mt-2 PlaylistContainer__title">{ name }</strong>
+    <p className="m-0 p-0 mt-1 PlaylistContainer__description">{ description }</p>
+    <small className="m-0 p-0 mt-2 PlaylistContainer__count">{`${trackCount} SONG${trackCount > 1 ? 'S' : ''}`}</small>
+  </PlaylistContainer>
+);
 
 Playlist.propTypes = {
   type: oneOf(['featured', 'playlist']),
   id: string,
   playing: bool,
-  playingId: string,
+  active: bool,
   name: string,
   description: string,
   trackCount: number,
@@ -150,11 +143,19 @@ Playlist.defaultProps = {
   type: 'playlist',
   id: '',
   playing: false,
-  playingId: '',
+  active: false,
   name: '',
   description: '',
   trackCount: 0,
   cover: {},
 };
 
-module.exports = Playlist;
+export default memo(Playlist, (previousProps, nextProps) => isEqual({
+  id: previousProps.id,
+  playing: previousProps.playing,
+  active: previousProps.active,
+}, {
+  id: nextProps.id,
+  playing: nextProps.playing,
+  active: nextProps.active,
+}));

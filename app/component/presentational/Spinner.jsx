@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { bool } from 'prop-types';
 import styled from 'react-emotion';
 import { keyframes } from 'emotion';
+import isEqual from 'react-fast-compare';
+
 
 const bounce = keyframes`
   0%, 100% {
@@ -11,11 +13,10 @@ const bounce = keyframes`
   }
 `;
 
-// left === ReactRouter + Spinner Width
-// top === (32px - 24px) / 2
+
 const SpinnerContainer = styled.div`
   position: absolute;
-  left: calc(200px - (0.64rem + 24px));
+  left: calc(220px - 2rem);
   top: 4px;
   width: 24px;
   height: 24px;
@@ -28,33 +29,32 @@ const SpinnerContainer = styled.div`
     right: 0;
     width: 24px;
     height: 24px;
-    color: ${props => props.theme.primary};
+    color: ${props => props.theme.PRIMARY_4};
   }
 
-  &.active .double-bounce1,
-  &.active .double-bounce2 {
+  &.active .SpinnerContainer__double-bounce1,
+  &.active .SpinnerContainer__double-bounce2 {
     position: absolute;
     right: 0;
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background-color: ${props => props.theme.primary};
+    background-color: ${props => props.theme.PRIMARY_4};
     opacity: 0.6;
     animation: ${bounce} 2.0s infinite ease-in-out;
   }
 
-  &.active .double-bounce2 {
+  &.active .SpinnerContainer__double-bounce2 {
     animation-delay: -1.0s;
   }
 `;
 
-function Spinner({
-  loading,
-}) {
+
+function Spinner({ loading }) {
   return (
     <SpinnerContainer className={loading ? 'active' : ''}>
-      <div className="double-bounce1" />
-      <div className="double-bounce2" />
+      <div className="SpinnerContainer__double-bounce1" />
+      <div className="SpinnerContainer__double-bounce2" />
     </SpinnerContainer>
   );
 }
@@ -67,4 +67,8 @@ Spinner.defaultProps = {
   loading: false,
 };
 
-module.exports = Spinner;
+export default memo(Spinner, (previousProps, nextProps) => isEqual({
+  loading: previousProps.loading,
+}, {
+  loading: nextProps.loading,
+}));

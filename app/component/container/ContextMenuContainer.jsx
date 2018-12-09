@@ -1,15 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { withRouter } from 'react-router';
-import { connect } from 'react-redux';
 
 import store from '@app/redux/store';
 import { CONTEXT_MENU_OFF_REQUEST } from '@app/redux/constant/contextMenu';
 import { SONG_SAVE_REQUEST, SONG_REMOVE_REQUEST } from '@app/redux/constant/song';
-
-import DJKhaled from '@app/component/hoc/DJKhaled';
+import { queueNextAdd, queueNextRemove } from '@app/redux/action/queueNext';
 import ContextMenu from '@app/component/presentational/ContextMenu';
+import { Context } from '@app/component/context/context';
 
-const closeContextMenu = () => {
+const contextMenuClose = () => {
   const { contextMenu } = store.getState();
 
   if (contextMenu === null) {
@@ -35,19 +34,36 @@ const songRemove = (track) => {
   });
 };
 
-const ContextMenuContainer = props => (<ContextMenu
-  {...props}
-  closeContextMenu={closeContextMenu}
-  songSave={songSave}
-  songRemove={songRemove}
-/>);
+const _queueNextAdd = (track) => {
+  store.dispatch(queueNextAdd(track));
+};
 
-// NOTE:
-// `history` prop comes from React Router not state
-// clash-alaregem
-// to prevent future name collision TODO: rename `history` state entry
-module.exports = DJKhaled(withRouter(connect(state => ({
-  contextMenu: state.contextMenu,
-  user: state.user,
-  song: state.song,
-}))(ContextMenuContainer)));
+const _queueNextRemove = (queueNextIndex) => {
+  store.dispatch(queueNextRemove(queueNextIndex));
+};
+
+const ContextMenuContainer = (props) => {
+  const {
+    contextMenu,
+    user,
+    song,
+    queueNext,
+  } = useContext(Context);
+
+  return (
+    <ContextMenu
+      queueNext={queueNext}
+      song={song}
+      user={user}
+      contextMenu={contextMenu}
+      contextMenuClose={contextMenuClose}
+      songSave={songSave}
+      songRemove={songRemove}
+      queueNextAdd={_queueNextAdd}
+      queueNextRemove={_queueNextRemove}
+      {...props}
+    />
+  );
+};
+
+export default withRouter(ContextMenuContainer);

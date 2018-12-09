@@ -1,5 +1,1 @@
-const CURRENT = 'CURRENT';
-
-module.exports = {
-  CURRENT,
-};
+export const CURRENT = 'CURRENT';

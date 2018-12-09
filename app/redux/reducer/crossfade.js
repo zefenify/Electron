@@ -1,5 +1,6 @@
 import { CROSSFADE } from '@app/redux/constant/crossfade';
 
+
 function crossfade(state = 0, action) {
   switch (action.type) {
     case CROSSFADE:
@@ -10,4 +11,5 @@ function crossfade(state = 0, action) {
   }
 }
 
-module.exports = crossfade;
+
+export default crossfade;

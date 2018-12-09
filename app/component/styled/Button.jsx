@@ -1,24 +1,36 @@
 import styled from 'react-emotion';
 
-const Button = styled.button`
-  background-color: ${props => props.outline ? 'transparent' : props.theme.primary};
-  border-radius: 2em;
-  border: ${props => props.outline ? `1px solid ${props.theme.listText}` : 'none'};
-  padding: ${props => props.noPadding ? '0' : '0.75em 2em'};
-  color: ${props => props.outline ? props.theme.listText : '#ffffff'};
-  transition: transform 250ms;
-  will-change: transform;
 
-  &:hover {
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: ${props => props.theme.PRIMARY_4};
+  border-radius: 2rem;
+  border: ${props => props.themeBorder ? `1px solid ${props.theme.NATURAL_4}` : 'none'};
+  padding: 0.75rem 2rem;
+  height: 38px;
+  color: ${props => props.themeColor ? props.theme.NATURAL_2 : 'hsl(0, 0%, 100%)'};
+  transition: transform 250ms;
+  box-shadow: ${props => props.noShadow ? 'nine' : `0 2px 6px ${props.theme.SHADOW}`};
+
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
     transform: scale3d(1.05, 1.05, 1);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: scale3d(0.95, 0.95, 1);
   }
 `;
 
-Button.ClearButton = styled.button`
+
+export const ClearButton = styled.button`
   display: block;
   width: 100%;
   padding: 0;
@@ -30,4 +42,5 @@ Button.ClearButton = styled.button`
   border-radius: 0;
 `;
 
-module.exports = Button;
+
+export default Button;

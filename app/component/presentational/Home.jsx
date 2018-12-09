@@ -1,8 +1,16 @@
-import React from 'react';
-import { bool, func, string, arrayOf, shape } from 'prop-types';
+import React, { memo } from 'react';
+import {
+  bool,
+  func,
+  string,
+  arrayOf,
+  shape,
+} from 'prop-types';
+import isEqual from 'react-fast-compare';
 
 import Playlist from '@app/component/presentational/Playlist';
-import FixedHeaderList from '@app/component/styled/FixedHeaderList';
+import HeaderView from '@app/component/styled/HeaderView';
+
 
 const Home = ({
   playing,
@@ -10,30 +18,30 @@ const Home = ({
   featuredPlayingId,
   featuredPlay,
 }) => (
-  <FixedHeaderList>
-    <div className="title">
-      <h2>Featured</h2>
+  <HeaderView>
+    <div className="__header">
+      <h1 className="m-0">Featured</h1>
     </div>
 
-    <div className="list">
+    <div className="__view">
       {
-        featured.map(f => (
+        featured.map(_featured => (
           <Playlist
-            key={f.playlist_id}
-            playing={playing}
-            play={featuredPlay}
-            playingId={featuredPlayingId}
             type="featured"
-            id={f.playlist_id}
-            name={f.playlist_name}
-            description={f.playlist_description}
-            cover={f.playlist_cover}
-            trackCount={f.playlist_track.length}
+            key={_featured.playlist_id}
+            id={_featured.playlist_id}
+            playing={playing && featuredPlayingId === _featured.playlist_id}
+            active={featuredPlayingId === _featured.playlist_id}
+            play={featuredPlay}
+            name={_featured.playlist_name}
+            description={_featured.playlist_description}
+            cover={_featured.playlist_cover}
+            trackCount={_featured.playlist_track.length}
           />
         ))
       }
     </div>
-  </FixedHeaderList>
+  </HeaderView>
 );
 
 Home.propTypes = {
@@ -49,4 +57,12 @@ Home.defaultProps = {
   featuredPlayingId: '',
 };
 
-module.exports = Home;
+export default memo(Home, (previousProps, nextProps) => isEqual({
+  playing: previousProps.playing,
+  featured: previousProps.featured,
+  featuredPlayingId: previousProps.featuredPlayingId,
+}, {
+  playing: nextProps.playing,
+  featured: nextProps.featured,
+  featuredPlayingId: nextProps.featuredPlayingId,
+}));

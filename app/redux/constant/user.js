@@ -1,7 +1,2 @@
-const USER = 'USER';
-const USER_REQUEST = 'USER_REQUEST';
-
-module.exports = {
-  USER,
-  USER_REQUEST,
-};
+export const USER = 'USER';
+export const USER_REQUEST = 'USER_REQUEST';

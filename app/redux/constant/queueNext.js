@@ -1,0 +1,2 @@
+export const QUEUE_NEXT_ADD = 'QUEUE_NEXT_ADD';
+export const QUEUE_NEXT_REMOVE = 'QUEUE_NEXT_REMOVE';

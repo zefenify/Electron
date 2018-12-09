@@ -1,5 +1,1 @@
-const DURATION = 'DURATION';
-
-module.exports = {
-  DURATION,
-};
+export const DURATION = 'DURATION';

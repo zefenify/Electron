@@ -1,134 +1,107 @@
-import React from 'react';
-import { func, shape, bool, number, arrayOf } from 'prop-types';
-import styled from 'react-emotion';
+import React, { memo } from 'react';
+import {
+  func,
+  shape,
+  bool,
+  number,
+  arrayOf,
+} from 'prop-types';
+import isEqual from 'react-fast-compare';
 
 import Track from '@app/component/presentational/Track';
-import Divider from '@app/component/styled/Divider';
 import Button from '@app/component/styled/Button';
+import HeaderView from '@app/component/styled/HeaderView';
 
-const RecentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 0 0 auto;
-
-  &.center-content {
-    flex: 1 0 auto;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .mute {
-    color: ${props => props.theme.controlMute};
-  }
-
-  .recently-played {
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 auto;
-    margin-bottom: 1em;
-
-    &__title {
-      margin: 0;
-      margin-bottom: -0.15em;
-    }
-
-    &__info {
-      color: ${props => props.theme.controlMute};
-    }
-
-    &__button {
-      width: 175px;
-      margin-bottom: 1em;
-    }
-  }
-
-  .track {
-    flex: 1 1 auto;
-
-    & > *:last-child {
-      margin-bottom: 1px;
-    }
-  }
-`;
 
 const Recent = ({
   playing,
   current,
-  history,
-  totalDuration,
-  historyPlaying,
-  historyPlayPause,
+  track,
+  durationTotal,
+  tracksPlaying,
+  tracksPlayPause,
   trackPlayPause,
   contextMenuTrack,
 }) => {
-  if (history.length === 0) {
+  if (track.length === 0) {
     return (
-      <RecentContainer className="center-content">
-        <h2 className="mute">You have no recently played songs...yet</h2>
-      </RecentContainer>
+      <div className="d-flex flex-column flex-grow-1 flex-shrink-0 align-items-center justify-content-center">
+        <h2>{ 'ኦ ማይ ጋድ, You Haven\'t Played Any Track...Yet' }</h2>
+      </div>
     );
   }
 
-  const { hours, minutes, seconds } = totalDuration;
+  const { hour, minute, second } = durationTotal;
 
   return (
-    <RecentContainer>
-      <div className="recently-played">
-        <h1 className="recently-played__title">Recently Played</h1>
-        <p className="recently-played__info">{`${history.length} song${history.length > 1 ? 's' : ''}, ${hours > 0 ? `${hours} hr` : ''} ${minutes} min ${hours > 0 ? '' : `${seconds} sec`}`}</p>
-        <Button className="recently-played__button" onClick={historyPlayPause}>{`${(playing && historyPlaying) ? 'PAUSE' : 'PLAY'}`}</Button>
+    <HeaderView>
+      <div className="__header">
+        <h1>Recently Played</h1>
       </div>
 
-      <Divider />
+      <div className="__view">
+        <div className="d-flex flex-column align-items-start flex-grow-1 px-3">
+          <p className="m-0 p-0 mt-3">{`${track.length} Song${track.length > 1 ? 's' : ''} • ${hour > 0 ? `${hour} hr` : ''} ${minute} min ${hour > 0 ? '' : `${second} sec`}`}</p>
+          <Button className="mt-2 mb-3" style={{ width: '125px' }} onClick={tracksPlayPause}>{`${(playing && tracksPlaying) ? 'PAUSE' : 'PLAY'}`}</Button>
 
-      <div className="track">
-        {
-          history.map((track, index) => (
-            <Track
-              key={track.track_id}
-              currentTrackId={current === null ? '' : current.track_id}
-              trackNumber={index + 1}
-              trackPlayPause={trackPlayPause}
-              playing={playing}
-              trackId={track.track_id}
-              trackName={track.track_name}
-              trackFeaturing={track.track_featuring}
-              trackDuration={track.track_track.s3_meta.duration}
-              trackAlbum={track.track_album}
-              contextMenuTrack={contextMenuTrack}
-            />
-          ))
-        }
+          {
+            track.map((_track, index) => (
+              <Track
+                key={_track.track_id}
+                currentTrackId={current === null ? 'ZEFENIFY' : current.track_id}
+                trackNumber={index + 1}
+                trackPlayPause={trackPlayPause}
+                playing={playing}
+                trackId={_track.track_id}
+                trackName={_track.track_name}
+                trackFeaturing={_track.track_featuring}
+                trackDuration={_track.track_track.s3_meta.duration}
+                trackAlbum={_track.track_album}
+                contextMenuTrack={contextMenuTrack}
+              />
+            ))
+          }
+        </div>
       </div>
-    </RecentContainer>
+    </HeaderView>
   );
 };
 
 Recent.propTypes = {
   playing: bool,
+  tracksPlaying: bool,
   current: shape({}),
-  history: arrayOf(shape({})),
-  totalDuration: shape({
-    hours: number,
-    minutes: number,
-    seconds: number,
+  track: arrayOf(shape({})),
+  durationTotal: shape({
+    hour: number,
+    minute: number,
+    second: number,
   }),
-  historyPlaying: bool,
-  historyPlayPause: func.isRequired,
   trackPlayPause: func.isRequired,
+  tracksPlayPause: func.isRequired,
   contextMenuTrack: func.isRequired,
 };
 
 Recent.defaultProps = {
   playing: false,
+  tracksPlaying: false,
   current: null,
-  history: [],
-  totalDuration: {
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+  track: [],
+  durationTotal: {
+    hour: 0,
+    minute: 0,
+    second: 0,
   },
-  historyPlaying: false,
 };
 
-module.exports = Recent;
+export default memo(Recent, (previousProps, nextProps) => isEqual({
+  playing: previousProps.playing,
+  tracksPlaying: previousProps.tracksPlaying,
+  current: previousProps.current,
+  track: previousProps.track,
+}, {
+  playing: nextProps.playing,
+  tracksPlaying: nextProps.tracksPlaying,
+  current: nextProps.current,
+  track: nextProps.track,
+}));

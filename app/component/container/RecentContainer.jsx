@@ -1,43 +1,26 @@
-// Congratulations!? you played yourself
-// DJ K...
-
-import React, { Component } from 'react';
-import { bool, shape, arrayOf, string } from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useContext } from 'react';
+import { shape, string } from 'prop-types';
 
 import { PLAY_REQUEST, PLAY_PAUSE_REQUEST } from '@app/redux/constant/wolfCola';
 import { CONTEXT_MENU_ON_REQUEST, CONTEXT_TRACK } from '@app/redux/constant/contextMenu';
-
 import store from '@app/redux/store';
-import historyDuration from '@app/redux/selector/historyDuration';
-import historyPlaying from '@app/redux/selector/historyPlaying';
+import tracksDuration from '@app/redux/selector/tracksDuration';
+import tracksPlaying from '@app/redux/selector/tracksPlaying';
 import { urlCurrentPlaying } from '@app/redux/action/urlCurrentPlaying';
-
-import DJKhaled from '@app/component/hoc/DJKhaled';
 import Recent from '@app/component/presentational/Recent';
+import { Context } from '@app/component/context/context';
 
-class RecentContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      totalDuration: historyDuration(props),
-      historyPlaying: historyPlaying(props),
-    };
 
-    this.historyPlayPause = this.historyPlayPause.bind(this);
-    this.trackPlayPause = this.trackPlayPause.bind(this);
-    this.contextMenuTrack = this.contextMenuTrack.bind(this);
-  }
+const RecentContainer = ({ match }) => {
+  const {
+    playing,
+    current,
+    history,
+    queueInitial,
+  } = useContext(Context);
 
-  componentWillReceiveProps(nextProps) {
-    this.setState(() => ({
-      totalDuration: historyDuration(nextProps),
-      historyPlaying: historyPlaying(nextProps),
-    }));
-  }
-
-  historyPlayPause() {
-    if (this.state.historyPlaying === true) {
+  const historyPlayPause = () => {
+    if (tracksPlaying({ queueInitial, tracks: history }) === true) {
       store.dispatch({
         type: PLAY_PAUSE_REQUEST,
       });
@@ -48,18 +31,18 @@ class RecentContainer extends Component {
     store.dispatch({
       type: PLAY_REQUEST,
       payload: {
-        play: this.props.history[0],
-        queue: this.props.history,
-        queueInitial: this.props.history,
+        play: history[0],
+        queue: history,
+        queueInitial: history,
       },
     });
 
-    store.dispatch(urlCurrentPlaying(this.props.match.url));
-  }
+    store.dispatch(urlCurrentPlaying(match.url));
+  };
 
-  trackPlayPause(trackId) {
-    if (this.props.current === null || this.props.current.track_id !== trackId) {
-      const trackIndex = this.props.history.findIndex(track => track.track_id === trackId);
+  const trackPlayPause = (trackId = 'ZEFENIFY') => {
+    if (current === null || current.track_id !== trackId) {
+      const trackIndex = history.findIndex(track => track.track_id === trackId);
 
       if (trackIndex === -1) {
         return;
@@ -68,23 +51,23 @@ class RecentContainer extends Component {
       store.dispatch({
         type: PLAY_REQUEST,
         payload: {
-          play: this.props.history[trackIndex],
-          queue: this.props.history,
-          queueInitial: this.props.history,
+          play: history[trackIndex],
+          queue: history,
+          queueInitial: history,
         },
       });
 
-      store.dispatch(urlCurrentPlaying(this.props.match.url));
+      store.dispatch(urlCurrentPlaying(match.url));
       return;
     }
 
     store.dispatch({
       type: PLAY_PAUSE_REQUEST,
     });
-  }
+  };
 
-  contextMenuTrack(trackId) {
-    const trackIndex = this.props.history.findIndex(track => track.track_id === trackId);
+  const contextMenuTrack = (trackId = 'ZEFENIFY') => {
+    const trackIndex = history.findIndex(track => track.track_id === trackId);
 
     if (trackIndex === -1) {
       return;
@@ -94,47 +77,29 @@ class RecentContainer extends Component {
       type: CONTEXT_MENU_ON_REQUEST,
       payload: {
         type: CONTEXT_TRACK,
-        payload: this.props.history[trackIndex],
+        payload: history[trackIndex],
       },
     });
-  }
+  };
 
-  render() {
-    return (
-      <Recent
-        playing={this.props.playing}
-        current={this.props.current}
-        history={this.props.history}
-        totalDuration={this.state.totalDuration}
-        historyPlaying={this.state.historyPlaying}
-        historyPlayPause={this.historyPlayPause}
-        trackPlayPause={this.trackPlayPause}
-        contextMenuTrack={this.contextMenuTrack}
-      />
-    );
-  }
-}
+  return (
+    <Recent
+      playing={playing}
+      current={current}
+      track={history}
+      durationTotal={tracksDuration({ tracks: history })}
+      tracksPlaying={tracksPlaying({ queueInitial, tracks: history })}
+      tracksPlayPause={historyPlayPause}
+      trackPlayPause={trackPlayPause}
+      contextMenuTrack={contextMenuTrack}
+    />
+  );
+};
 
 RecentContainer.propTypes = {
-  playing: bool,
-  current: shape({}),
-  history: arrayOf(shape({})),
   match: shape({
     url: string,
   }).isRequired,
 };
 
-RecentContainer.defaultProps = {
-  playing: false,
-  current: null,
-  history: [],
-};
-
-module.exports = DJKhaled(connect(state => ({
-  playing: state.playing,
-  current: state.current,
-  history: state.history,
-  queueInitial: state.queueInitial,
-  totalDuration: historyDuration(state),
-  historyPlaying: historyPlaying(state),
-}))(RecentContainer));
+export default RecentContainer;

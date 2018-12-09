@@ -1,5 +1,6 @@
 import { REMAINING } from '@app/redux/constant/remaining';
 
+
 function remaining(state = false, action) {
   switch (action.type) {
     case REMAINING:
@@ -10,4 +11,5 @@ function remaining(state = false, action) {
   }
 }
 
-module.exports = remaining;
+
+export default remaining;

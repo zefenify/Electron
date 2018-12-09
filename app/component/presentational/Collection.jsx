@@ -1,57 +1,40 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { func, string, bool } from 'prop-types';
+import {
+  func,
+  string,
+  bool,
+  oneOfType,
+  arrayOf,
+  shape,
+} from 'prop-types';
 import styled from 'react-emotion';
+import isEqual from 'react-fast-compare';
 
 import { BASE_S3 } from '@app/config/api';
 import ImageContainer from '@app/component/styled/ImageContainer';
-import FixedHeaderList from '@app/component/styled/FixedHeaderList';
+import HeaderView from '@app/component/styled/HeaderView';
 import Playlist from '@app/component/presentational/Playlist';
 
+
 const CollectionContainer = styled(Link)`
-  position: relative;
-  display: flex;
-  flex-direction: column;
   flex: 0 0 25%;
-  padding: 0 1em;
-  margin-bottom: 3em;
   text-decoration: none;
   color: inherit;
   transition: transform 128ms;
-  will-change: transform;
 
-  &.active {
-    color: ${props => props.theme.primary};
-
-    .collection-name {
-      color: ${props => props.theme.primary};
-    }
+  .CollectionContainer__name {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: ${props => props.theme.NATURAL_2};
   }
 
-  &:not(.active) {
-    svg {
-      color: #fff !important;
-    }
+  .CollectionContainer__count {
+    color: ${props => props.theme.NATURAL_4};
   }
 
   @media(min-width: 1282px) {
     flex: 0 0 20%;
-  }
-
-  .collection-name {
-    padding: 0;
-    margin: 0;
-    line-height: 125%;
-    font-size: 1.25em;
-    font-weight: bold;
-    margin-top: 0.5em;
-  }
-
-  .collection-playlist-count {
-    padding: 0;
-    margin: 0;
-    margin-top: 0.5em;
-    color: ${props => props.theme.controlMute};
   }
 
   &:active {
@@ -67,72 +50,73 @@ const Collection = ({
   collectionName,
   playlistPlayingId,
 }) => {
-  if (collection !== null) {
-    // collection list...
-    if (collectionId === '') {
-      return (
-        <FixedHeaderList>
-          <div className="title">
-            <h2>{ collectionName }</h2>
-          </div>
+  if (collection === null) {
+    return null;
+  }
 
-          <div className="list">
-            {
-              collection.map(c => (
-                <CollectionContainer to={`/collection/${c.collection_id}`}>
-                  <ImageContainer>
-                    <img alt={c.collection_name} src={`${BASE_S3}${c.collection_cover.s3_name}`} />
-                  </ImageContainer>
-
-                  <strong className="collection-name">{ c.collection_name }</strong>
-                  <small className="collection-playlist-count">{`${c.collection_playlist.length} PLAYLIST${c.collection_playlist.length > 1 ? 'S' : ''}`}</small>
-                </CollectionContainer>
-              ))
-            }
-
-          </div>
-        </FixedHeaderList>
-      );
-    }
-
+  // collection list...
+  if (collectionId === '') {
     return (
-      <FixedHeaderList>
-        <div className="title">
-          <h2>{ collectionName }</h2>
+      <HeaderView>
+        <div className="__header">
+          <h1>{ collectionName }</h1>
         </div>
 
-        <div className="list">
+        <div className="__view">
           {
-            collection.collection_playlist.map(p => (
-              <Playlist
-                key={p.playlist_id}
-                playing={playing}
-                play={playlistPlay}
-                playingId={playlistPlayingId}
-                type="playlist"
-                id={p.playlist_id}
-                name={p.playlist_name}
-                description={p.playlist_description}
-                cover={p.playlist_cover}
-                trackCount={p.playlist_track.length}
-              />
+            collection.map(_collection => (
+              <CollectionContainer className="d-flex flex-column flex-grow-0 py-0 px-3 mb-4" key={_collection.collection_id} to={`/collection/${_collection.collection_id}`}>
+                <ImageContainer>
+                  <img alt={_collection.collection_name} src={`${BASE_S3}${_collection.collection_cover.s3_name}`} />
+                </ImageContainer>
+
+                <strong className="m-0 p-0 mt-2 CollectionContainer__name">{ _collection.collection_name }</strong>
+                <small className="m-0 p-0 mt-1 CollectionContainer__count">{`${_collection.collection_playlist.length} PLAYLIST${_collection.collection_playlist.length > 1 ? 'S' : ''}`}</small>
+              </CollectionContainer>
             ))
           }
+
         </div>
-      </FixedHeaderList>
+      </HeaderView>
     );
   }
 
-  return null;
+  return (
+    <HeaderView>
+      <div className="__header">
+        <h1>{ collectionName }</h1>
+      </div>
+
+      <div className="__view">
+        {
+          collection.collection_playlist.map(playlist => (
+            <Playlist
+              type="playlist"
+              key={playlist.playlist_id}
+              playing={playing && playlistPlayingId === playlist.playlist_id}
+              active={playlistPlayingId === playlist.playlist_id}
+              play={playlistPlay}
+              playingId={playlistPlayingId}
+              id={playlist.playlist_id}
+              name={playlist.playlist_name}
+              description={playlist.playlist_description}
+              cover={playlist.playlist_cover}
+              trackCount={playlist.playlist_track.length}
+            />
+          ))
+        }
+      </div>
+    </HeaderView>
+  );
 };
 
 Collection.propTypes = {
-  playing: bool,
-  collectionId: string,
-  collection: null,
-  playlistPlay: func.isRequired,
   collectionName: string,
   playlistPlayingId: string,
+  playing: bool,
+  collectionId: string,
+  collection: oneOfType([shape({}), arrayOf(shape({}))]),
+  playlistPlay: func.isRequired,
 };
 
 Collection.defaultProps = {
@@ -143,4 +127,16 @@ Collection.defaultProps = {
   playlistPlayingId: '',
 };
 
-module.exports = Collection;
+export default memo(Collection, (previousProps, nextProps) => isEqual({
+  collectionName: previousProps.collectionName,
+  playlistPlayingId: previousProps.playlistPlayingId,
+  playing: previousProps.playing,
+  collectionId: previousProps.collectionId,
+  collection: previousProps.collection,
+}, {
+  collectionName: nextProps.collectionName,
+  playlistPlayingId: nextProps.playlistPlayingId,
+  playing: nextProps.playing,
+  collectionId: nextProps.collectionId,
+  collection: nextProps.collection,
+}));

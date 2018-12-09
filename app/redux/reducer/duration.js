@@ -1,6 +1,7 @@
 import { DURATION } from '@app/redux/constant/duration';
 
-function duration(state = null, action) {
+
+function duration(state = 0, action) {
   switch (action.type) {
     case DURATION:
       return action.payload;
@@ -10,4 +11,5 @@ function duration(state = null, action) {
   }
 }
 
-module.exports = duration;
+
+export default duration;

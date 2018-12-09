@@ -1,5 +1,1 @@
-const PLAYING = 'PLAYING';
-
-module.exports = {
-  PLAYING,
-};
+export const PLAYING = 'PLAYING';

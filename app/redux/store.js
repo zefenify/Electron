@@ -1,8 +1,20 @@
 /* global window */
 /* eslint max-len: off */
 
-// import { createStore, combineReducers, applyMiddleware } from 'redux'; // production
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'; // development
+// production
+// import {
+//   createStore,
+//   combineReducers,
+//   applyMiddleware,
+// } from 'redux';
+
+// development
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware,
+  compose,
+} from 'redux';
 import createSagaMiddleware from 'redux-saga';
 
 import theme from '@app/redux/reducer/theme';
@@ -14,8 +26,9 @@ import playing from '@app/redux/reducer/playing';
 import duration from '@app/redux/reducer/duration';
 import playbackPosition from '@app/redux/reducer/playbackPosition';
 import remaining from '@app/redux/reducer/remaining';
-import queue from '@app/redux/reducer/queue';
 import current from '@app/redux/reducer/current';
+import queue from '@app/redux/reducer/queue';
+import queueNext from '@app/redux/reducer/queueNext';
 import queueInitial from '@app/redux/reducer/queueInitial';
 import history from '@app/redux/reducer/history';
 import loading from '@app/redux/reducer/loading';
@@ -24,8 +37,8 @@ import contextMenu from '@app/redux/reducer/contextMenu';
 import song from '@app/redux/reducer/song';
 import notification from '@app/redux/reducer/notification';
 import urlCurrentPlaying from '@app/redux/reducer/urlCurrentPlaying';
-
 import rootSaga from '@app/redux/saga/sagas';
+
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
@@ -39,8 +52,9 @@ const store = createStore(
     duration,
     playbackPosition,
     remaining,
-    queue,
     current,
+    queue,
+    queueNext,
     queueInitial,
     history,
     loading,
@@ -51,16 +65,17 @@ const store = createStore(
     urlCurrentPlaying,
   }),
   {
-    theme: 'dark',
+    theme: 'DARK',
     volume: 1,
     queue: [],
+    queueNext: [], // queue of tracks that have been requested to be played next
     queueInitial: [], // queue of tracks to be played [used on repeat `ALL` and queue is empty]
     history: [], // where played tracks will are pushed [repeat `ONE` will only push once]
-    song: null, // saved tracks
+    song: null, // saved tracks { data, included }
     // playlist: [],
-    crossfade: 0,
-    duration: 0,
-    playbackPosition: 0,
+    crossfade: 0, // in seconds
+    duration: 0, // current playing track duration in seconds
+    playbackPosition: 0, // current playing track playback position in seconds
     remaining: false,
     // artworkFull: false,
     playing: false,
@@ -75,9 +90,9 @@ const store = createStore(
     urlCurrentPlaying: null,
   },
   // applyMiddleware(sagaMiddleware), // production
-  window.devToolsExtension ? compose(applyMiddleware(sagaMiddleware), window.devToolsExtension()) : applyMiddleware(sagaMiddleware), // development
+  window.__REDUX_DEVTOOLS_EXTENSION__ ? compose(applyMiddleware(sagaMiddleware), window.__REDUX_DEVTOOLS_EXTENSION__()) : applyMiddleware(sagaMiddleware), // development
 );
 
 sagaMiddleware.run(rootSaga);
 
-module.exports = store;
+export default store;
