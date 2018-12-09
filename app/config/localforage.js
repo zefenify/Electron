@@ -11,6 +11,7 @@ export const LOCALFORAGE_STORE = {
   CROSSFADE: 'CROSSFADE',
   REMAINING: 'REMAINING',
   USER: 'USER',
+  SONG: 'SONG',
 };
 
 localforage.config({
