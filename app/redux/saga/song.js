@@ -1,39 +1,11 @@
-/* global window */
-import {
-  put,
-  fork,
-  select,
-  takeEvery,
-} from 'redux-saga/effects';
+import { put, select, takeEvery } from 'redux-saga/effects';
 import axios from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
-import localforage from 'localforage';
 
-import { BASE, BASE_S3, HEADER } from '@app/config/api';
-import { LOCALFORAGE_STORE } from '@app/config/localforage';
+import { BASE, HEADER } from '@app/config/api';
 import { NOTIFICATION_ON_REQUEST } from '@app/redux/constant/notification';
 import { SONG_SAVE_REQUEST, SONG_REMOVE_REQUEST, SONG_BOOT_REQUEST } from '@app/redux/constant/song';
-import songTrack from '@app/redux/selector/songTrack';
 import { song } from '@app/redux/action/song';
 import { loading } from '@app/redux/action/loading';
-
-
-/**
- * goes through songs -> download via yield, one at a time
- * call _download via fork
- *
- * @param {Array} songs
- */
-function* _download(songs = []) {
-  let i = 0;
-
-  if (window.ELECTRON !== undefined) {
-    while (i < songs.length) {
-      yield window.ELECTRON.fileDownload(`${BASE_S3}${songs[i].track_track.s3_name}`);
-      i += 1;
-    }
-  }
-}
 
 
 export function* songBoot() {
@@ -56,15 +28,9 @@ export function* songBoot() {
 
     yield put(loading(false));
     yield put(song(data));
-    yield localforage.setItem(LOCALFORAGE_STORE.SONG, data);
-    yield fork(_download, songTrack({ song: data }));
   } catch (songsError) {
     yield put(loading(false));
-
-    // fetching from server failed, attempting boot from `localforage`...
-    const localforageSong = yield localforage.getItem(LOCALFORAGE_STORE.SONG);
-
-    yield put(song(localforageSong));
+    yield put(song(null));
 
     if (songsError.message === 'Network Error') {
       yield put({
@@ -115,8 +81,6 @@ function* _songSave(action) {
 
     yield put(loading(false));
     yield put(song(data));
-    yield localforage.setItem(LOCALFORAGE_STORE.SONG, data);
-    yield fork(_download, songTrack({ song: data }));
   } catch (songsSaveError) {
     yield put(loading(false));
 
@@ -148,7 +112,6 @@ function* _songRemove(action) {
     return;
   }
 
-  const songPreviousState = cloneDeep(state.song); // to be used if song removal is successful
   const savedTrackIds = state.song.data.song_track;
   const trackId = action.payload.track_id;
 
@@ -173,12 +136,6 @@ function* _songRemove(action) {
 
     yield put(loading(false));
     yield put(song(data));
-    yield localforage.setItem(LOCALFORAGE_STORE.SONG, data);
-
-    if (window.ELECTRON !== undefined) {
-      const { s3, track } = songPreviousState.included;
-      window.ELECTRON.fileDelete(s3[track[trackId].track_track].s3_name);
-    }
   } catch (songRemoveError) {
     yield put(loading(false));
 

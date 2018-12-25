@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { shape } from 'prop-types';
 import { withRouter } from 'react-router-dom';
-import styled from 'react-emotion';
+import styled from '@emotion/styled';
 
 import { Context } from '@app/component/context/context';
 import Spinner from '@app/component/presentational/Spinner';

@@ -11,7 +11,7 @@ import {
 } from 'react-router-dom';
 import { ThemeProvider } from 'emotion-theming';
 
-import '@app/component/styled/Global';
+import GlobalStyle from '@app/component/styled/Global';
 import '@app/util/mediaKeys';
 import { LIGHT, DARK } from '@app/config/theme';
 import store from '@app/redux/store';
@@ -55,6 +55,11 @@ const WolfCola = () => {
     const unsubscribe = store.subscribe(() => {
       setState(store.getState());
     });
+
+    const wolfColaContainer = document.querySelector('#wolf-cola-container');
+    if (wolfColaContainer !== null) {
+      wolfColaContainer.classList.remove('booting');
+    }
 
     return () => {
       unsubscribe();
@@ -127,6 +132,7 @@ const WolfCola = () => {
               <ControlContainer />
             </WolfColaContainer>
 
+            <GlobalStyle />
             <WindowDrag />
             <ContextMenuContainer />
             <ContextOverlayContainer />
