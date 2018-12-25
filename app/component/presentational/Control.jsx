@@ -127,6 +127,7 @@ const ControlsContainer = styled.div`
 
 const Control = ({
   like,
+  user,
   current,
   queueNext,
   togglePlayPause,
@@ -179,6 +180,7 @@ const Control = ({
       onKeyPress={likeTrackToggle}
       onClick={likeTrackToggle}
       className={`px-2 ControlsContainer__like${current === null ? '' : ' active'}${like === true ? ' like' : ''}`}
+      style={{ display: user === null ? 'none' : undefined }}
     >
       <Heart strokeWidth="1" fill={like === true ? 'currentColor' : 'none'} />
     </div>

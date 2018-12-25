@@ -96,6 +96,7 @@ const ControlContainer = () => {
     urlCurrentPlaying,
     queueNext,
     song,
+    user,
   } = useContext(Context);
   const [state, setState] = useState({
     liked: false,
@@ -131,6 +132,7 @@ const ControlContainer = () => {
 
   return (
     <Control
+      user={user}
       queueNext={queueNext}
       current={current}
       duration={duration}
