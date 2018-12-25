@@ -13,17 +13,6 @@ import Range from '@app/component/styled/Range';
 import HeaderView from '@app/component/styled/HeaderView';
 
 
-const DMCA = styled.a`
-  text-decoration: none;
-  color: #ff6d5e;
-  border-radius: 2em;
-  padding: 0.75em 2.75em;
-  font-size: 1em;
-  margin-bottom: 1em;
-  border: 1px solid #ff6d5e;
-`;
-
-
 const Form = styled.form`
   input {
     border: 1px solid red;
@@ -134,8 +123,6 @@ const Settings = ({
           step="1"
         />
       </div>
-
-      <DMCA href="/dmca.html" target="_blank">DMCA</DMCA>
     </div>
   </HeaderView>
 );
